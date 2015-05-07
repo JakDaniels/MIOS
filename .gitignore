@@ -3,3 +3,7 @@
 Instances/*/*/*
 !Instances/.config/*/*
 Instances/.config/.runlist
+Instances/.config/OpenSim.ini
+Instances/.config/config-include/GridCommon.ini
+
+
