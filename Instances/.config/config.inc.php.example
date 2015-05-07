@@ -5,10 +5,10 @@
 	$mysql= array(
 		'RegionDBServer'	=>array('server'=>'localhost',
 															'user'	=>'opensim_admin',
-															'pwd'		=>'0p3n51m4dm1n'),
+															'pwd'		=>'xxxxx'),
 		'EstateDBServer'	=>array('server'=>'localhost',
 															'user'	=>'opensim_admin',
-															'pwd'		=>'0p3n51m4dm1n')
+															'pwd'		=>'xxxxx')
 	);
 
 	// where are the opensim databases kept for regions and estate?
@@ -17,10 +17,10 @@
 	$opensim=array(
 		'RegionDBServer'	=>array('server'=>'localhost',
 															'user'	=>'opensim',
-															'pwd'		=>'0p3n51m$'),
+															'pwd'		=>'xxxxx'),
 		'EstateDBServer'	=>array('server'=>'localhost',
 															'user'	=>'opensim',
-															'pwd'		=>'0p3n51m$')
+															'pwd'		=>'xxxxx')
 	);
 
 
