@@ -6,6 +6,9 @@ of Open Simulator and add new regions to those Instances.
 It also monitors the Instances and respawns them if necessary after a crash, or marks them as broken
 if the respawn happens too often and too many times.
 
-Run ./opensim.sh.php --help for more instructions.
+It does need some initial configuration. These instaructions will follow shortly.
+
+
+Run ./opensim.sh.php --help for more instructions on manipulating Instances once the initial config is done.
 
 
