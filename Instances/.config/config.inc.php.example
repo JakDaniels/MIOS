@@ -24,8 +24,8 @@
 	);
 
 
-	define('INSTANCE_MIN_PORT',9016);
-	define('INSTANCE_MAX_PORT',9024);
+	define('INSTANCE_MIN_PORT',9000);
+	define('INSTANCE_MAX_PORT',9025);
 	define('INSTANCE_DB_PREFIX','Opensim_');
 	define('ESTATE_DB','Estate');
 
