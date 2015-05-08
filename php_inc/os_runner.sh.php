@@ -39,7 +39,7 @@ $args=parse_args($argc,$argv);
 if(isset($args['h']) or isset($args['help'])) error(usage());
 if(isset($args['d']) or isset($args['debug'])) $debug=1; else $debug=0;
 
-if($debug) date_log("***** Starting Up! *****\n");
+if($debug) date_log("***** Started *****\n");
 $runlist=BASE_CONFIGS.'.runlist';
 $pidfile=BASE_CONFIGS.'.pidfile';
 $tmuxfile=HOME_DIR.'/.tmux.conf';
@@ -155,7 +155,19 @@ if($debug) date_log(sprintf("Terminating and removing pidfile %s\n",$pidfile));
 `tmux kill-window -t $tsn:0`; //kill the top window
 @unlink($pidfile);
 
+if($debug) date_log("***** Stopped *****\n");
 
+function usage() {
+	return "
+os_runner.sh.php [ -d ]
+
+This script controls the actual launching and monitoring of opensim instances.
+It is not usually invoked directly, but is spawned by opensim.sh.php when there
+are Instances to run.
+";
+}
+
+//TMUX cheat sheet...
 // tmux new-session -d -s OpenSim -n OpenSimConsole1 -x 132 -y 50 'mono OpenSim.exe'
 // tmux new-window -d -n Window1 -t OpenSim:1
 // tmux new-window -d -n Window2 -t OpenSim:2
@@ -163,9 +175,5 @@ if($debug) date_log(sprintf("Terminating and removing pidfile %s\n",$pidfile));
 // tmux kill-window -t OpenSim:2
 // tmux send-keys -t OpenSim:2 'shutdown' Enter
 
-function usage() {
-	return "
-os_runner.sh.php [ -d ]
-";
-}
+
 ?>
