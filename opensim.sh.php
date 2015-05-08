@@ -11,6 +11,7 @@ define('OUT_CONF_DIR',BASE_DIR.'%s/ConfigOut/');
 define('BIN_DIR',HOME_DIR.'/opensim/bin/');
 define('INC_DIR',HOME_DIR.'/MIOS/php_inc/');
 define('OS_RUNNER',INC_DIR.'os_runner.sh.php');
+define('OS_RUNNER_LOG',HOME_DIR.'/MIOS/Logs/os_runner.log');
 define('OS_EXEC',INC_DIR.'os_exec.sh');
 
 include(BASE_CONFIGS.'config.inc.php');
@@ -303,7 +304,7 @@ if($stop) {
 	for($i=0;$i<count($rl);$i++) {
 		if(substr($rl[$i],-7)=='stopped') $stopped++;
 	}
-	print $stopped." ".count($rl);
+	//print $stopped." ".count($rl);
 	if($stopped==count($rl)) { //all stopped
 		if($debug) print "All Stopped! Terminating os_runner.\n";
 		if(file_exists($pidfile)) {
@@ -331,9 +332,9 @@ if($start) {
 
 	// make sure that the os_runner daemon is running
 	if(!file_exists($pidfile)) {
-		$cmd=OS_RUNNER.' -d 2>&1 >>'.LOGS_DIR.'os_runner.log &';
+		$cmd=OS_RUNNER.' -d 2>/dev/null >>'.OS_RUNNER_LOG.' &';
 		if($debug) printf("Running %s\n",$cmd);
-		`$cmd`;
+		`exec $cmd`;
 	}
 
 	foreach($instances as $inst) {

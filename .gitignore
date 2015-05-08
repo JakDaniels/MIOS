@@ -6,3 +6,4 @@ Instances/.config/.runlist
 Instances/.config/OpenSim.ini
 Instances/.config/config.inc.php
 Instances/.config/config-include/GridCommon.ini
+Logs/*

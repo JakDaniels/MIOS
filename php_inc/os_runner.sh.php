@@ -39,6 +39,7 @@ $args=parse_args($argc,$argv);
 if(isset($args['h']) or isset($args['help'])) error(usage());
 if(isset($args['d']) or isset($args['debug'])) $debug=1; else $debug=0;
 
+if($debug) date_log("***** Starting Up! *****\n");
 $runlist=BASE_CONFIGS.'.runlist';
 $pidfile=BASE_CONFIGS.'.pidfile';
 $tmuxfile=HOME_DIR.'/.tmux.conf';
@@ -49,6 +50,7 @@ write_text_file($tmuxfile,"set-option -g prefix ".TMUX_CONTROL_PREFIX."\nset-opt
 `tmux new-session -d -s $tsn -n Top -x 132 -y 50 'top' || tmux new-window -d -n Top -t $tsn:0 'top' 2>/dev/null`;
 
 $pid=getmypid();
+//if($pid=pcntl_fork()) return;
 if($debug) date_log(sprintf("Writing %s to pidfile %s\n",$pid,$pidfile));
 write_text_file($pidfile,"$pid\n");
 
