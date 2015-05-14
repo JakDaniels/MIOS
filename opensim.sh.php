@@ -616,10 +616,10 @@ spaces.
            is equivalent to:
 
            cd ~; git clone https://github.com/opensim/opensim.git &&
-             xbuild /t:clean && ./runprebuild.sh autoclean &&
-             ./runprebuild.sh vs2010 && xbuild /p:Configuration=Release
+             ./runprebuild.sh autoclean && ./runprebuild.sh vs2010 &&
+             xbuild /p:Configuration=Release
 
-           for initial install or:
+           for an initial install or:
 
            cd ~/opensim; git pull && xbuild /t:clean &&
              ./runprebuild.sh autoclean && ./runprebuild.sh vs2010 &&
