@@ -66,7 +66,7 @@ if(isset($args['init-mysql'])) {
 
 	if($mysql['RegionDBServer']['server']==$mysql['EstateDBServer']['server']) {
 		print "You will need to provide the mysql root password to do this.\n";
-		$cmd=sprintf("mysql -h %s -u -root -p -e \"create user '%s'@'localhost' identified by '%s'; create user '%s'@'localhost' identified by '%s'; grant CREATE,DROP,ALTER,RELOAD to '%s'@'localhost; grant all on %s* to '%s'@'localhost'; grant all on %s to '%s'@'localhost'; flush privileges;\"",
+		$cmd=sprintf("mysql -h %s -u root -p -e \"create user '%s'@'localhost' identified by '%s'; create user '%s'@'localhost' identified by '%s'; grant CREATE,DROP,ALTER,RELOAD to '%s'@'localhost; grant all on %s* to '%s'@'localhost'; grant all on %s to '%s'@'localhost'; flush privileges;\"",
 				$mysql['RegionDBServer']['server'],$mysql['RegionDBServer']['user'],$mysql['RegionDBServer']['pwd'],
 				$opensim['RegionDBServer']['server'],$opensim['RegionDBServer']['user'],$opensim['RegionDBServer']['pwd'],
 				$mysql['RegionDBServer']['user'],
@@ -74,13 +74,13 @@ if(isset($args['init-mysql'])) {
 		`$cmd`;
 	} else {
 		print "You will need to provide the mysql root password twice to do this.\n";
-		$cmd=sprintf("mysql -h %s -u -root -p -e \"create user '%s'@'localhost' identified by '%s'; create user '%s'@'localhost' identified by '%s'; grant CREATE,DROP,ALTER,RELOAD to '%s'@'localhost; grant all on %s* to '%s'@'localhost'; flush privileges;\"",
+		$cmd=sprintf("mysql -h %s -u root -p -e \"create user '%s'@'localhost' identified by '%s'; create user '%s'@'localhost' identified by '%s'; grant CREATE,DROP,ALTER,RELOAD to '%s'@'localhost; grant all on %s* to '%s'@'localhost'; flush privileges;\"",
 				$mysql['RegionDBServer']['server'],$mysql['RegionDBServer']['user'],$mysql['RegionDBServer']['pwd'],
 				$opensim['RegionDBServer']['server'],$opensim['RegionDBServer']['user'],$opensim['RegionDBServer']['pwd'],
 				$mysql['RegionDBServer']['user'],
 				INSTANCE_DB_PREFIX,$opensim['RegionDBServer']['user']);
 		`$cmd`;
-		$cmd=sprintf("mysql -h %s -u -root -p -e \"create user '%s'@'localhost' identified by '%s'; create user '%s'@'localhost' identified by '%s'; grant CREATE,DROP,ALTER,RELOAD to '%s'@'localhost; grant all on %s to '%s'@'localhost'; flush privileges;\"",
+		$cmd=sprintf("mysql -h %s -u root -p -e \"create user '%s'@'localhost' identified by '%s'; create user '%s'@'localhost' identified by '%s'; grant CREATE,DROP,ALTER,RELOAD to '%s'@'localhost; grant all on %s to '%s'@'localhost'; flush privileges;\"",
 				$mysql['EstateDBServer']['server'],$mysql['EstateDBServer']['user'],$mysql['EstateDBServer']['pwd'],
 				$opensim['EstateDBServer']['server'],$opensim['EstateDBServer']['user'],$opensim['EstateDBServer']['pwd'],
 				$opensim['EstateDBServer']['user'],ESTATE_DB,$opensim['EstateDBServer']['user']);
