@@ -59,6 +59,36 @@ if(isset($args['os-update'])) {
 	exit(0);
 }
 
+//****************************************************************************************************SETUP MYSQL DB USERS****
+if(isset($args['init-mysql'])) {
+	if(!file_exists('/var/run/mysqld/mysqld.pid')) die("Mysql Server is not running!\nPlease make sure that Mysql is installed and configured to always run at boot time.\n");
+	print "We are about to add two users to mysql, one for administering databases, and one that opensim will use for database access.\n";
+
+	if($mysql['RegionDBServer']['server']==$mysql['EstateDBServer']['server']) {
+		print "You will need to provide the mysql root password to do this.\n";
+		$cmd=sprintf("mysql -h %s -u -root -p -e \"create user '%s'@'localhost' identified by '%s'; create user '%s'@'localhost' identified by '%s'; grant CREATE,DROP,ALTER,RELOAD to '%s'@'localhost; grant all on %s* to '%s'@'localhost'; grant all on %s to '%s'@'localhost'; flush privileges;\"",
+				$mysql['RegionDBServer']['server'],$mysql['RegionDBServer']['user'],$mysql['RegionDBServer']['pwd'],
+				$opensim['RegionDBServer']['server'],$opensim['RegionDBServer']['user'],$opensim['RegionDBServer']['pwd'],
+				$mysql['RegionDBServer']['user'],
+				INSTANCE_DB_PREFIX,$opensim['RegionDBServer']['user'],ESTATE_DB,$opensim['RegionDBServer']['user'];
+		`$cmd`;
+	} else {
+		print "You will need to provide the mysql root password twice to do this.\n";
+		$cmd=sprintf("mysql -h %s -u -root -p -e \"create user '%s'@'localhost' identified by '%s'; create user '%s'@'localhost' identified by '%s'; grant CREATE,DROP,ALTER,RELOAD to '%s'@'localhost; grant all on %s* to '%s'@'localhost'; flush privileges;\"",
+				$mysql['RegionDBServer']['server'],$mysql['RegionDBServer']['user'],$mysql['RegionDBServer']['pwd'],
+				$opensim['RegionDBServer']['server'],$opensim['RegionDBServer']['user'],$opensim['RegionDBServer']['pwd'],
+				$mysql['RegionDBServer']['user'],
+				INSTANCE_DB_PREFIX,$opensim['RegionDBServer']['user']);
+		`$cmd`;
+		$cmd=sprintf("mysql -h %s -u -root -p -e \"create user '%s'@'localhost' identified by '%s'; create user '%s'@'localhost' identified by '%s'; grant CREATE,DROP,ALTER,RELOAD to '%s'@'localhost; grant all on %s to '%s'@'localhost'; flush privileges;\"",
+				$mysql['EstateDBServer']['server'],$mysql['EstateDBServer']['user'],$mysql['EstateDBServer']['pwd'],
+				$opensim['EstateDBServer']['server'],$opensim['EstateDBServer']['user'],$opensim['EstateDBServer']['pwd'],
+				$opensim['EstateDBServer']['user'],ESTATE_DB,$opensim['EstateDBServer']['user'];
+		`$cmd`;
+	}
+	exit(0);
+}
+
 //get a list of instance configs
 $instances=enum_instances();
 $runlist=BASE_CONFIGS.'.runlist';
