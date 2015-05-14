@@ -75,16 +75,18 @@ if(isset($args['init-mysql'])) {
 		`$cmd`;
 	} else {
 		print "You will need to provide the mysql root password twice to do this.\n";
+		printf("Configuring server %s:\n",$mysql['RegionDBServer']['server']);
 		$cmd=sprintf("mysql -h %s -u root -p -e \"grant CREATE,DROP,ALTER,RELOAD on *.* to '%s'@'localhost' identified by '%s'; grant all on \`%s%%\`.* to '%s'@'localhost' identified by '%s'; flush privileges;\"",
 				$mysql['RegionDBServer']['server'],
 				$mysql['RegionDBServer']['user'],$mysql['RegionDBServer']['pwd'],
 				INSTANCE_DB_PREFIX,$opensim['RegionDBServer']['user'],$opensim['RegionDBServer']['pwd']);
 		if($debug) printf("Running: %s\n",$cmd);
 		`$cmd`;
+		printf("Configuring server %s:\n",$mysql['EstateDBServer']['server']);
 		$cmd=sprintf("mysql -h %s -u root -p -e \"grant CREATE,DROP,ALTER,RELOAD on *.* to '%s'@'localhost' identified by '%s'; grant all on %s.* to '%s'@'localhost' identified by '%s'; flush privileges;\"",
-				$mysql['RegionDBServer']['server'],
-				$mysql['RegionDBServer']['user'],$mysql['RegionDBServer']['pwd'],
-				ESTATE_DB,$opensim['RegionDBServer']['user'],$opensim['RegionDBServer']['pwd']);
+				$mysql['EstateDBServer']['server'],
+				$mysql['EstateDBServer']['user'],$mysql['EstateDBServer']['pwd'],
+				ESTATE_DB,$opensim['EstateDBServer']['user'],$opensim['EstateDBServer']['pwd']);
 		if($debug) printf("Running: %s\n",$cmd);
 		`$cmd`;
 	}
