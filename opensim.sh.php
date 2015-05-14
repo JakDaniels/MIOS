@@ -8,6 +8,7 @@ define('CONFIGS_DIR',BASE_DIR.'%s/Configs/');
 define('LOGS_DIR',BASE_DIR.'%s/Logs/');
 define('SCRIPTS_DIR',BASE_DIR.'%s/ScriptEngines/');
 define('OUT_CONF_DIR',BASE_DIR.'%s/ConfigOut/');
+define('OS_ROOT_DIR',HOME_DIR.'/opensim/');
 define('BIN_DIR',HOME_DIR.'/opensim/bin/');
 define('INC_DIR',HOME_DIR.'/MIOS/php_inc/');
 define('OS_RUNNER',INC_DIR.'os_runner.sh.php');
@@ -40,6 +41,23 @@ if($argc==0) error(usage());
 $args=parse_args($argc,$argv);
 if(isset($args['h']) or isset($args['help'])) error(usage());
 if(isset($args['d']) or isset($args['debug'])) $debug=1; else $debug=0;
+
+$dependencies=array('/usr/bin/git','/usr/bin/tmux','/usr/bin/mono','/usr/bin/xbuild');
+foreach($dependencies as $d) if(!file_exists($d)) die("You are missing a dependency that is needed by MIOS! Please install package containing '$d'\n");
+
+//****************************************************************************************************UPDATE/INSTALL OPENSIM****
+if(isset($args['os-update'])) {
+	if(!file_exists(BIN_DIR)) { //no opensim is installed. Do a fresh git clone.
+		$cmd='cd '.HOME_DIR.'; git clone https://github.com/opensim/opensim.git && xbuild /t:clean && ./runprebuild.sh autoclean && ./runprebuild.sh vs2010 && xbuild /p:Configuration=Release';
+		if($debug) printf("Running: %s\n",$cmd);
+		passthru($cmd);
+	} else {
+		$cmd='cd '.OS_ROOT_DIR.'; git pull && xbuild /t:clean && ./runprebuild.sh autoclean && ./runprebuild.sh vs2010 && xbuild /p:Configuration=Release';
+		if($debug) printf("Running: %s\n",$cmd);
+		passthru($cmd);
+	}
+	exit(0);
+}
 
 //get a list of instance configs
 $instances=enum_instances();
@@ -542,7 +560,8 @@ if($view) {
 
 
 function usage() {
-	return "opensim.sh.php [--option|--option[=]value]
+	return "
+opensim.sh.php [--option|--option[=]value]
 
 Creates and manages OpenSimulator instances and regions. It allows you to run
 multiple instances of Opensim from one binary build of the OpenSim code.
@@ -552,6 +571,30 @@ The options that you give to this script determine the actions taken.
 The values, if provided must be enclosed in quotes (\") if the value contains
 spaces.
 
+**--------------------------------**
+**Install/Update and build options**
+**--------------------------------**
+
+--os-update
+           Install or Update the OpenSim binaries using the latest dev code
+           from git master. The version is built in release mode. This command
+           is equivalent to:
+
+           cd ~; git clone https://github.com/opensim/opensim.git &&
+             xbuild /t:clean && ./runprebuild.sh autoclean &&
+             ./runprebuild.sh vs2010 && xbuild /p:Configuration=Release
+
+           for initial install or:
+
+           cd ~/opensim; git pull && xbuild /t:clean &&
+             ./runprebuild.sh autoclean && ./runprebuild.sh vs2010 &&
+             xbuild /p:Configuration=Release
+
+           for an update.
+
+**--------------------------**
+**Managing OpenSim Instances**
+**--------------------------**
 
 --inst     Displays a quick list of all the configured instances. Each instance
            has a unique name which is used to identify it.
@@ -573,23 +616,6 @@ spaces.
            are required to control that instance. You will need to add at least
            one Region to the instance in order to be able to start and stop the
            instance.
-
-
---add-region RegionName
-           Required parameters:
-  --instance InstanceName   The instance name that the Region will be added to.
-
-           Optional Parameters (values auto generated if not specified):
-  [--location xxxxx,yyyyy]  Position on the grid for the new Region
-  [--uuid xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx]  UUID of the new Region
-  [--port pppp]             Port number the Region listens on
-
-
---rename-region NewRegionName
-           Required parameters:
-  --uuid=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx    The UUID of the Region you are
-                                                 renaming.
-
 
 --start [InstanceName[,InstanceName]...]
            Attempt to start all or just the named instances. If an instance for
@@ -616,6 +642,24 @@ If an instance crashes while running, it will be attempted to be restarted.
 If it starts and then dies within MAX_RESTART_TIME_INTERVAL seconds then after
 MAX_RESTART_COUNT times of trying, the instance will be marked as broken.
 
+**-----------------------------------------**
+**Managing Regions within OpenSim Instances**
+**-----------------------------------------**
+
+--add-region RegionName
+           Required parameters:
+  --instance InstanceName   The instance name that the Region will be added to.
+
+           Optional Parameters (values auto generated if not specified):
+  [--location xxxxx,yyyyy]  Position on the grid for the new Region
+  [--uuid xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx]  UUID of the new Region
+  [--port pppp]             Port number the Region listens on
+
+
+--rename-region NewRegionName
+           Required parameters:
+  --uuid=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx    The UUID of the Region you are
+                                                 renaming.
 ";
 }
 
