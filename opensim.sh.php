@@ -66,7 +66,7 @@ if(isset($args['init-mysql'])) {
 
 	if($mysql['RegionDBServer']['server']==$mysql['EstateDBServer']['server']) {
 		print "You will need to provide the mysql root password to do this.\n";
-		$cmd=sprintf("mysql -h %s -u root -p -e \"grant CREATE,DROP,ALTER,RELOAD to '%s'@'localhost identified by '%s'; grant all on %s* to '%s'@'localhost' identified by '%s'; grant all on %s to '%s'@'localhost'; flush privileges;\"",
+		$cmd=sprintf("mysql -h %s -u root -p -e \"grant CREATE,DROP,ALTER,RELOAD to '%s'@'localhost' identified by '%s'; grant all on %s* to '%s'@'localhost' identified by '%s'; grant all on %s to '%s'@'localhost'; flush privileges;\"",
 				$mysql['RegionDBServer']['server'],
 				$mysql['RegionDBServer']['user'],$mysql['RegionDBServer']['pwd'],
 				INSTANCE_DB_PREFIX,$opensim['RegionDBServer']['user'],$opensim['RegionDBServer']['pwd'],
