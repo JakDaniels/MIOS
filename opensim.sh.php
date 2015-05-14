@@ -693,9 +693,9 @@ MAX_RESTART_COUNT times of trying, the instance will be marked as broken.
 --add-region RegionName
            Required parameters:
   --instance InstanceName   The instance name that the Region will be added to.
+  --location xxxxx,yyyyy    Position on the grid for the new Region
 
            Optional Parameters (values auto generated if not specified):
-  [--location xxxxx,yyyyy]  Position on the grid for the new Region
   [--uuid xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx]  UUID of the new Region
   [--port pppp]             Port number the Region listens on
 
