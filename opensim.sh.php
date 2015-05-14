@@ -15,7 +15,8 @@ define('OS_RUNNER',INC_DIR.'os_runner.sh.php');
 define('OS_RUNNER_LOG',HOME_DIR.'/MIOS/Logs/os_runner.log');
 define('OS_EXEC',INC_DIR.'os_exec.sh');
 
-include(BASE_CONFIGS.'config.inc.php');
+if(file_exists(BASE_CONFIGS.'config.inc.php')) include(BASE_CONFIGS.'config.inc.php');
+else die("You must create a config file '".BASE_CONFIGS."config.inc.php' before you can use this script!\nPlease use '".BASE_CONFIGS."config.inc.php.example' as a template .\n");
 include('php_inc/dbfunctions.inc.php');
 include('php_inc/functions.inc.php');
 include('php_inc/os_functions.inc.php');
@@ -625,6 +626,15 @@ spaces.
              xbuild /p:Configuration=Release
 
            for an update.
+
+--init-mysql
+           Add the two users to Mysql that are required to manage and run
+           Opensim Instances. The users are: 'opensim' which have full access
+           to each Instance database and the Estate database, and
+           'opensim_admin' which is used to create the Instance databases when
+           an Instance is added using this script. The host, user and password
+           details are taken from the config file:
+           ".BASE_CONFIGS."config.inc.php
 
 **--------------------------**
 **Managing OpenSim Instances**
