@@ -100,7 +100,7 @@ while(1) {
 			if(!file_exists($c_inipath) or !file_exists($e_inipath)) $status='stopped';
 			else {
 				if(!tmux_session_start($tsn)) {
-					date_log("Could not start tmux session: $tsn. Aborting!\n"));
+					date_log("Could not start tmux session: $tsn. Aborting!\n");
 					$signalled='SIGTERM';
 					break;
 				}
