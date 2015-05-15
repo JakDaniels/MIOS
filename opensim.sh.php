@@ -266,7 +266,7 @@ if(isset($args['rename-region'])) {
 
 
 //*********************************************************************************************START RESTART STOP STATUS & VIEW****
-$start=0; $restart=0; $stop=0; $status=0; $view=0;
+$start=0; $restart=0; $stop=0; $status=0; $view=0; $config=0;
 if(isset($args['start'])) {
 	if($args['start']==1) $start=$instances; else $start=explode(',',str_replace('"','',trim($args['start'])));
 }
