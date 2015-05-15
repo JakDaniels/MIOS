@@ -63,7 +63,9 @@ function make_instance_directories($inst) {
 
 function enum_instances() {
 	$configs=BASE_DIR;	//get a list of instance configs
-	$instances=explode("\n", trim(`ls -1 "${configs}"|grep -v "\."`));
+	$l=trim(`ls -1 "${configs}"|grep -v "\."`);
+	if($l!='') $instances=explode("\n",$l);
+	else $instances=array();
 	return $instances;
 }
 
