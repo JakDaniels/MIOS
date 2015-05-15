@@ -94,7 +94,7 @@ while(1) {
 		}
 
 		if($action=='start') {
-			if($debug) date_log(sprintf("Starting %s...\n",$inst));
+			if($debug) date_log(sprintf("Starting Instance: %s...\n",$inst));
 			$c_inipath=sprintf(OUT_CONF_DIR,$inst).'combined.ini';
 			$e_inipath=sprintf(OUT_CONF_DIR,$inst).'empty.ini';
 			if(!file_exists($c_inipath) or !file_exists($e_inipath)) $status='stopped';
@@ -104,7 +104,6 @@ while(1) {
 					$signalled='SIGTERM';
 					break;
 				}
-				//$cmd=sprintf("tmux new-window -d -n %s -t %s:%s 'cd ~/opensim/bin; mono OpenSim.exe -inimaster=\"%s\" -inifile=\"%s\"'",$rs,$tsn,$index,$e_inipath,$c_inipath);
 				$cmd=sprintf("tmux new-window -d -n %s -t %s:%s '%s \"%s\" \"%s\"'",$rs,$tsn,$index,OS_EXEC,$e_inipath,$c_inipath);
 				if($debug) date_log(sprintf("Running: %s\n",$cmd));
 				`$cmd`;
@@ -124,7 +123,7 @@ while(1) {
 		}
 
 		if($action=='stop') {
-			if($debug) date_log(sprintf("Stopping %s...\n",$inst));
+			if($debug) date_log(sprintf("Stopping Instance: %s...\n",$inst));
 			$cmd=sprintf("tmux send-keys -t %s:%s 'shutdown' Enter",$tsn,$index);
 			if($debug) date_log(sprintf("Running: %s\n",$cmd));
 			`$cmd`;
