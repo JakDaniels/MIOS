@@ -47,7 +47,7 @@ $tmuxfile=HOME_DIR.'/.tmux.conf';
 $tsn=TMUX_SESSION_NAME;
 write_text_file($tmuxfile,"set-option -g prefix ".TMUX_CONTROL_PREFIX."\nset-option -g history-limit ".TMUX_SCROLL_BUFFER."\n");
 
-`tmux new-session -d -s $tsn -n Top -x 132 -y 50 'top' || tmux new-window -d -n Top -t $tsn:0 'top' 2>/dev/null`;
+//`tmux new-session -d -s $tsn -n Top -x 132 -y 50 'top' || tmux new-window -d -n Top -t $tsn:0 'top' 2>/dev/null`;
 
 $pid=getmypid();
 //if($pid=pcntl_fork()) return;
@@ -99,6 +99,11 @@ while(1) {
 			$e_inipath=sprintf(OUT_CONF_DIR,$inst).'empty.ini';
 			if(!file_exists($c_inipath) or !file_exists($e_inipath)) $status='stopped';
 			else {
+				if(!tmux_session_start($tsn)) {
+					date_log("Could not start tmux session: $tsn. Aborting!\n"));
+					$signalled='SIGTERM';
+					break;
+				}
 				//$cmd=sprintf("tmux new-window -d -n %s -t %s:%s 'cd ~/opensim/bin; mono OpenSim.exe -inimaster=\"%s\" -inifile=\"%s\"'",$rs,$tsn,$index,$e_inipath,$c_inipath);
 				$cmd=sprintf("tmux new-window -d -n %s -t %s:%s '%s \"%s\" \"%s\"'",$rs,$tsn,$index,OS_EXEC,$e_inipath,$c_inipath);
 				if($debug) date_log(sprintf("Running: %s\n",$cmd));
