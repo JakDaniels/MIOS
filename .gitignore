@@ -8,4 +8,5 @@ Instances/.config/.pidfile
 Instances/.config/OpenSim.ini
 Instances/.config/config.inc.php
 Instances/.config/config-include/GridCommon.ini
+Instances/.config/config-include/FlotsamCache.ini
 Logs/*
