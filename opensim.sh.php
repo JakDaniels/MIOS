@@ -12,7 +12,8 @@ define('OS_ROOT_DIR',HOME_DIR.'/opensim/');
 define('BIN_DIR',HOME_DIR.'/opensim/bin/');
 define('INC_DIR',HOME_DIR.'/MIOS/php_inc/');
 define('OS_RUNNER',INC_DIR.'os_runner.sh.php');
-define('OS_RUNNER_LOG',HOME_DIR.'/MIOS/Logs/os_runner.log');
+define('OS_RUNNER_LOG_DIR',HOME_DIR.'/MIOS/Logs/');
+define('OS_RUNNER_LOG',OS_RUNNER_LOG_DIR.'os_runner.log');
 define('OS_EXEC',INC_DIR.'os_exec.sh');
 
 if(file_exists(BASE_CONFIGS.'config.inc.php')) include(BASE_CONFIGS.'config.inc.php');
@@ -396,6 +397,7 @@ if($start) {
 
 	// make sure that the os_runner daemon is running
 	if(!file_exists($pidfile)) {
+		@mkdir(OS_RUNNER_LOG_DIR);
 		$cmd=OS_RUNNER.' -d 2>/dev/null >>'.OS_RUNNER_LOG.' &';
 		if($debug) printf("Running %s\n",$cmd);
 		`exec $cmd`;
