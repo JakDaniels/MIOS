@@ -67,29 +67,38 @@ if(isset($args['init-mysql'])) {
 
 	if($mysql['RegionDBServer']['server']==$mysql['EstateDBServer']['server']) {
 		print "You will need to provide the mysql root password to do this.\n";
-		$cmd=sprintf("mysql -h %s -u root -p -e \"grant CREATE,DROP,ALTER,RELOAD on *.* to '%s'@'localhost' identified by '%s'; grant all on \`%s%%\`.* to '%s'@'localhost' identified by '%s'; grant all on %s.* to '%s'@'localhost'; flush privileges;\"",
-				$mysql['RegionDBServer']['server'],
+		$sql=sprintf("grant CREATE,DROP,ALTER,RELOAD on *.* to '%s'@'localhost' identified by '%s';\ngrant all on `%s%%`.* to '%s'@'localhost' identified by '%s';\ngrant all on %s.* to '%s'@'localhost';\nflush privileges;\n",
 				$mysql['RegionDBServer']['user'],$mysql['RegionDBServer']['pwd'],
 				INSTANCE_DB_PREFIX,$opensim['RegionDBServer']['user'],$opensim['RegionDBServer']['pwd'],
 				ESTATE_DB,$opensim['RegionDBServer']['user']);
-		if($debug) printf("Running: %s\n",$cmd);
-		`$cmd`;
+		if(write_text_file(BASE_CONFIGS.'tmp.sql',$sql)) {
+			$cmd=sprintf("mysql -h %s -u root -p <%s", $mysql['RegionDBServer']['server'], BASE_CONFIGS.'tmp.sql');
+			if($debug) printf("Running: %s\n",$cmd);
+			`$cmd`;
+			@unlink(BASE_CONFIGS.'tmp.sql');
+		}
 	} else {
 		print "You will need to provide the mysql root password twice to do this.\n";
 		printf("Configuring server %s:\n",$mysql['RegionDBServer']['server']);
-		$cmd=sprintf("mysql -h %s -u root -p -e \"grant CREATE,DROP,ALTER,RELOAD on *.* to '%s'@'localhost' identified by '%s'; grant all on \`%s%%\`.* to '%s'@'localhost' identified by '%s'; flush privileges;\"",
-				$mysql['RegionDBServer']['server'],
+		$sql=sprintf("grant CREATE,DROP,ALTER,RELOAD on *.* to '%s'@'localhost' identified by '%s';\ngrant all on `%s%%`.* to '%s'@'localhost' identified by '%s';\nflush privileges;\n",
 				$mysql['RegionDBServer']['user'],$mysql['RegionDBServer']['pwd'],
 				INSTANCE_DB_PREFIX,$opensim['RegionDBServer']['user'],$opensim['RegionDBServer']['pwd']);
-		if($debug) printf("Running: %s\n",$cmd);
-		`$cmd`;
+		if(write_text_file(BASE_CONFIGS.'tmp.sql',$sql)) {
+			$cmd=sprintf("mysql -h %s -u root -p <%s", $mysql['RegionDBServer']['server'], BASE_CONFIGS.'tmp.sql');
+			if($debug) printf("Running: %s\n",$cmd);
+			`$cmd`;
+			@unlink(BASE_CONFIGS.'tmp.sql');
+		}
 		printf("Configuring server %s:\n",$mysql['EstateDBServer']['server']);
-		$cmd=sprintf("mysql -h %s -u root -p -e \"grant CREATE,DROP,ALTER,RELOAD on *.* to '%s'@'localhost' identified by '%s'; grant all on %s.* to '%s'@'localhost' identified by '%s'; flush privileges;\"",
-				$mysql['EstateDBServer']['server'],
+		$sql=sprintf("grant CREATE,DROP,ALTER,RELOAD on *.* to '%s'@'localhost' identified by '%s'\ngrant all on %s.* to '%s'@'localhost' identified by '%s'\nflush privileges;\n",
 				$mysql['EstateDBServer']['user'],$mysql['EstateDBServer']['pwd'],
 				ESTATE_DB,$opensim['EstateDBServer']['user'],$opensim['EstateDBServer']['pwd']);
-		if($debug) printf("Running: %s\n",$cmd);
-		`$cmd`;
+		if(write_text_file(BASE_CONFIGS.'tmp.sql',$sql)) {
+			$cmd=sprintf("mysql -h %s -u root -p <%s", $mysql['EstateDBServer']['server'], BASE_CONFIGS.'tmp.sql');
+			if($debug) printf("Running: %s\n",$cmd);
+			`$cmd`;
+			@unlink(BASE_CONFIGS.'tmp.sql');
+		}
 	}
 	exit(0);
 }
