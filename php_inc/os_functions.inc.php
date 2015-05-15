@@ -199,6 +199,7 @@ function tmux_window_state($session,$window) {
 }
 
 function tmux_session_start($session) {
+	global $debug;
 	$c=0;
 	while($c++<5) {
 		$seslist=explode("\n",trim(`tmux list-sessions`));
@@ -206,7 +207,9 @@ function tmux_session_start($session) {
 			$sn=explode(":",$s);
 			if($session==$sn[0]) return 1;
 		}
-		`tmux new-session -d -s $session -n Top -x 132 -y 50 'top' || tmux new-window -d -n Top -t $tsn:0 'top' 2>/dev/null`;
+		$cmd="tmux new-session -d -s $session -n Top -x 132 -y 50 'top' || tmux new-window -d -n Top -t $tsn:0 'top' 2>/dev/null";
+		if($debug) date_log(sprintf("Running: %s\n",$cmd));
+		`$cmd`;
 		sleep(1);
 	}
 	return 0;
