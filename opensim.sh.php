@@ -279,6 +279,9 @@ if(isset($args['stop'])) {
 
 if(($start and $restart) or ($start and $stop) or ($restart and $stop)) die("Options --start --restart or --stop cannot be used together!\n");
 
+if(isset($args['config'])) {
+	if($args['config']==1) $config=$instances; else $config=explode(',',str_replace('"','',trim($args['config'])));
+}
 if(isset($args['status'])) {
 	if($args['status']==1) $status=$instances; else $status=explode(',',str_replace('"','',trim($args['status'])));
 }
@@ -417,11 +420,11 @@ if($start) {
 		$rs=str_replace(" ","_",$inst); //replace spaces with _ in instance names for when we create the database and tmux windows
 		make_instance_directories($inst);
 
-		$inis[]=array('[Const]'=>	array('InstanceName'=>$inst,
-																		'InstancePort'=>$base_port[$inst],
-																		'InstanceDBName'=>INSTANCE_DB_PREFIX.$rs,
-																		'EstateDBName'=>ESTATE_DB,
-																		'ConfigBase'=>CONFIGS_DIR
+		$inis[]=array('Const'=>	array('InstanceName'=>$inst,
+																	'InstancePort'=>$base_port[$inst],
+																	'InstanceDBName'=>INSTANCE_DB_PREFIX.$rs,
+																	'EstateDBName'=>ESTATE_DB,
+																	'ConfigBase'=>CONFIGS_DIR
 																		));
 		$inifiles=array(BASE_CONFIGS."OpenSimDefaults.ini",
 										BASE_CONFIGS."OpenSim.ini",
@@ -561,6 +564,43 @@ if($start) {
 		}
 	}
 }
+//****************************************************************************************************CONFIG OF INSTANCE(S)********
+if($config) {
+	if(isset($args['section'])) $section=explode(",",$args['section']); else $section=0;
+	foreach($config as $ci) if(!in_array($ci,$instances)) die(sprintf("An instance named '%s' was not found! Use --inst to show possible instance names.\n",$ci));
+	// start by enumerating all the existing region names, uuids and ports,
+	// each instance can run one or more regions and if regions are defined without ports and uuids
+	// then we add them to Regions.ini now so there are no conflicts later
+	$instances=$config;
+	$used_ports=array();
+	$used_uuids=array();
+	$base_port=array();
+	$regions_list=array();
+	foreach($instances as $inst) {
+		$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list);
+	}
+	foreach($instances as $inst) {
+		$c_inipath=sprintf(OUT_CONF_DIR,$inst).'combined.ini';
+		$ini=parse_ini($c_inipath, true, INI_SCANNER_RAW) or array();
+		print "***********************************************************************************\n";
+		printf("Instance: %s\n",$inst);
+		if($section) {
+			foreach($section as $s) {
+				if(isset($ini[$s])) {
+					printf("Section:\n[%s]\n",$s);
+					foreach($ini[$s] as $k=>$v) printf("\t%s = %s\n",$k,$v);
+				}
+			}
+		} else {
+			foreach($ini as $s=>$data) {
+				printf("\n[%s]\n",$s);
+				foreach($data as $k=>$v) printf("\t%s = %s\n",$k,$v);
+			}
+		}
+		print "***********************************************************************************\n";
+	}
+
+}
 //****************************************************************************************************STATUS OF INSTANCE(S)********
 if($status) {
 	foreach($status as $si) if(!in_array($si,$instances)) die(sprintf("An instance named '%s' was not found! Use --inst to show possible instance names.\n",$si));
@@ -694,6 +734,12 @@ spaces.
            Switch to the console display and optionally select the window for
            the instance InstanceName. The console display(s) run in TMUX, and
            the usual TMUX keys are used to switch panes, scroll and exit etc.
+
+--config [InstanceName[,InstanceName]...]
+           Show the running config of all or just the named instances. An
+           instance must have been previously started for the config to exist.
+  [--section Name[,Name]...] View only a particular section or sections of the
+                             configuration.
 
 If an instance crashes while running, it will be attempted to be restarted.
 If it starts and then dies within MAX_RESTART_TIME_INTERVAL seconds then after
