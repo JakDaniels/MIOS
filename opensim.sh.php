@@ -424,7 +424,7 @@ if($start) {
 																	'InstancePort'=>$base_port[$inst],
 																	'InstanceDBName'=>INSTANCE_DB_PREFIX.$rs,
 																	'EstateDBName'=>ESTATE_DB,
-																	'ConfigBase'=>CONFIGS_DIR
+																	'ConfigBase'=>sprintf(CONFIGS_DIR,$inst);
 																		));
 		$inifiles=array(BASE_CONFIGS."OpenSimDefaults.ini",
 										BASE_CONFIGS."OpenSim.ini",
