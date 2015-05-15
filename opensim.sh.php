@@ -114,6 +114,8 @@ if(isset($args['add-instance'])) {
 	exit(0);
 }
 
+print_r($instances);
+
 //everything below here requires some instances to be configured!
 if(count($instances)<1) die("There are no Opensim Instances Configured! Use --add-instance to start.\n");
 
