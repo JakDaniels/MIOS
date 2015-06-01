@@ -117,6 +117,9 @@ while(1) {
 						$cmd=sprintf("tmux select-window -t %s:%s",$tsn,$index);
 						if($debug) date_log(sprintf("Running: %s\n",$cmd));
 						`$cmd`;
+						$cmd=sprintf('sleep 5; renice -n %s -p `cat "%s"`',RENICE_VALUE, $pidpath);
+						if($debug) date_log(sprintf("Running: %s\n",$cmd));
+						`$cmd`;
 						break;
 					}
 				}

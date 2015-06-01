@@ -40,6 +40,8 @@
 	define('TMUX_STOP_TIMEOUT',10);
 	define('TMUX_CONTROL_PREFIX','C-a'); //what control key combo do we use for tmux? CTRL+A
 	define('TMUX_SCROLL_BUFFER',10000);  //how much scrollback do we want?
+	
+	define('RENICE_VALUE',-10);	//renice the mono process(s)
 
 	define('BULLET_IN_OWN_THREAD',1); //run bulletsim in it's own thread
 
