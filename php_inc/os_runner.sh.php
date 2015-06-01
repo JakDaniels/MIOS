@@ -97,6 +97,7 @@ while(1) {
 			if($debug) date_log(sprintf("Starting Instance: %s...\n",$inst));
 			$c_inipath=sprintf(OUT_CONF_DIR,$inst).'combined.ini';
 			$e_inipath=sprintf(OUT_CONF_DIR,$inst).'empty.ini';
+			$pidpath=sprintf(LOGS_DIR,$inst).'OpenSim.pid';
 			if(!file_exists($c_inipath) or !file_exists($e_inipath)) $status='stopped';
 			else {
 				if(!tmux_session_start($tsn)) {
@@ -104,7 +105,7 @@ while(1) {
 					$signalled='SIGTERM';
 					break;
 				}
-				$cmd=sprintf("tmux new-window -d -n %s -t %s:%s '%s \"%s\" \"%s\"'",$rs,$tsn,$index,OS_EXEC,$e_inipath,$c_inipath);
+				$cmd=sprintf("tmux new-window -d -n %s -t %s:%s '%s \"%s\" \"%s\" \"%s\"'",$rs,$tsn,$index,OS_EXEC,$e_inipath,$c_inipath,$pidpath);
 				if($debug) date_log(sprintf("Running: %s\n",$cmd));
 				`$cmd`;
 				for($timer=0;$timer<TMUX_START_TIMEOUT;$timer++) {
