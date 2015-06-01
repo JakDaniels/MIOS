@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export MONO_THREADS_PER_CPU=2048
+export MONO_THREADS_PER_CPU=4096
 export MONO_GC_PARAMS=nursery-size=64m
 
 cd ~/opensim/bin
