@@ -521,6 +521,7 @@ if($start) {
 
 			printf("Starting Instance: %s",$inst);
 			$entry=sprintf("%s\t%s\t%s",$inst,$rs,$base_port[$inst]);
+			$pidpath=sprintf(LOGS_DIR,$inst).'OpenSim.pid';
 			$cstatus='stopped'; //default if no entry found
 			$timer=0;
 
