@@ -321,6 +321,18 @@ if($stop) {
 		$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list);
 	}
 
+	// make sure that the os_runner daemon is running
+	if(file_exists($pidfile)) {
+		$pid=trim(file_get_contents($pidfile));
+		if(!file_exists("/proc/${pid}")) @unlink($pidfile);
+	}
+	if(!file_exists($pidfile)) {
+		@mkdir(OS_RUNNER_LOG_DIR);
+		$cmd=OS_RUNNER.' -d 2>/dev/null >>'.OS_RUNNER_LOG.' &';
+		if($debug) printf("Running %s\n",$cmd);
+		`exec $cmd`;
+	}
+
 	foreach($instances as $inst) {
 
 		if(count($regions_list[$inst])==0) {
@@ -380,6 +392,7 @@ if($stop) {
 			$cmd='kill -s 2 '.$pid;
 			if($debug) print "Running $cmd\n";
 			`$cmd`;
+			@unlink($pidfile);
 		}
 	}
 }
@@ -399,6 +412,10 @@ if($start) {
 	}
 
 	// make sure that the os_runner daemon is running
+	if(file_exists($pidfile)) {
+		$pid=trim(file_get_contents($pidfile));
+		if(!file_exists("/proc/${pid}")) @unlink($pidfile);
+	}
 	if(!file_exists($pidfile)) {
 		@mkdir(OS_RUNNER_LOG_DIR);
 		$cmd=OS_RUNNER.' -d 2>/dev/null >>'.OS_RUNNER_LOG.' &';
