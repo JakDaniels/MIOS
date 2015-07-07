@@ -69,7 +69,7 @@ if(isset($args['grid-config'])) {
 			if($debug) printf("Running: %s\n",$cmd);
 			passthru($cmd);
 		}
-	} else die("Could not find a section in the config fior retrieving configs for '$grid'.\n");
+	} else die("Could not find a section in the config for retrieving configs from '$grid'.\n");
 }
 //****************************************************************************************************SETUP MYSQL DB USERS****
 if(isset($args['init-mysql'])) {
