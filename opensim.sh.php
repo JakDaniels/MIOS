@@ -63,8 +63,8 @@ if(isset($args['os-update'])) {
 //**************************************************************************************UPDATE/INSTALL OPENSIM GRID CONFIGS****
 if(isset($args['grid-config'])) {
 	$grid=$args['grid-config'];
-	if(isset($grid-configs[$grid])) {
-		foreach($grid-configs[$grid] as $k=>$v) {
+	if(isset($gridconfigs[$grid])) {
+		foreach($gridconfigs[$grid] as $k=>$v) {
 			$cmd="wget -O ".BASE_CONFIGS."$k $v";
 			if($debug) printf("Running: %s\n",$cmd);
 			passthru($cmd);
@@ -710,6 +710,11 @@ spaces.
              xbuild /p:Configuration=Release
 
            for an update.
+
+--grid-config name
+           Downloads configs from the web for a named grid, where the filenames
+           and web urls are listed in the MIOS configuration. See the example
+           config.ini.example file for OSGrid configs
 
 --init-mysql
            Add the two users to Mysql that are required to manage and run

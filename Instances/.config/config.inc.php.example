@@ -24,7 +24,7 @@
 	);
 	
 	//where are grid wide configs downloaded from?
-	$grid-configs['osgrid'] = array(
+	$gridconfigs['osgrid'] = array(
 		'OpenSim.ini'				=> 'http://download.osgrid.org/OpenSim.ini.txt',
 		'config-include/GridCommon.ini'		=> 'http://download.osgrid.org/GridCommon.ini.txt',
 		'config-include/FlotsamCache.ini'	=> 'http://download.osgrid.org/FlotsamCache.ini.txt'
