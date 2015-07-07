@@ -60,7 +60,17 @@ if(isset($args['os-update'])) {
 	}
 	exit(0);
 }
-
+//**************************************************************************************UPDATE/INSTALL OPENSIM GRID CONFIGS****
+if(isset($args['grid-config'])) {
+	$grid=$args['grid-config'];
+	if(isset($grid-configs[$grid])) {
+		foreach($grid-configs[$grid] as $k=>$v) {
+			$cmd="wget -O ".BASE_CONFIGS."$k $v";
+			if($debug) printf("Running: %s\n",$cmd);
+			passthru($cmd);
+		}
+	} else die("Could not find a section in the config fior retrieving configs for '$grid'.\n");
+}
 //****************************************************************************************************SETUP MYSQL DB USERS****
 if(isset($args['init-mysql'])) {
 	if(!file_exists('/var/run/mysqld/mysqld.pid')) die("Mysql Server is not running!\nPlease make sure that Mysql is installed and configured to always run at boot time.\n");
