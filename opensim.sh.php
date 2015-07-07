@@ -505,6 +505,7 @@ if($start) {
 		$ini['Network']['http_listener_port']=$base_port[$inst];
 		$ini['Network']['http_listener_sslport']=$base_port[$inst]+SSL_PORT_OFFSET;
 
+		unset($ini['DatabaseService']['Include-Storage']); //always using mysql
 		$ini['DatabaseService']['StorageProvider']='OpenSim.Data.MySQL.dll';
 		$ini['DatabaseService']['ConnectionString']=sprintf("Data Source=%s;Database=%s;User ID=%s;Password=%s;Old Guids=true;",
 																													$opensim['RegionDBServer']['server'],
