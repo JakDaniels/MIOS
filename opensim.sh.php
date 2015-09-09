@@ -54,7 +54,7 @@ if(isset($args['os-update'])) {
 		if($debug) printf("Running: %s\n",$cmd);
 		passthru($cmd);
 	} else {
-		$cmd='cd '.OS_ROOT_DIR.'; git pull && xbuild /t:clean && ./runprebuild.sh autoclean && ./runprebuild.sh vs2010 && xbuild /p:Configuration=Release';
+		$cmd='cd '.OS_ROOT_DIR.'; mv bin/OpenSim.exe.config bin/OpenSim.exe.config.tmp; git pull && xbuild /t:clean && ./runprebuild.sh autoclean && ./runprebuild.sh vs2010 && xbuild /p:Configuration=Release; mv bin/OpenSim.exe.config.tmp bin/OpenSim.exe.config';
 		if($debug) printf("Running: %s\n",$cmd);
 		passthru($cmd);
 	}
