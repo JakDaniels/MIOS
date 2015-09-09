@@ -275,7 +275,7 @@ if(isset($args['rename-region'])) {
 }
 
 
-//*********************************************************************************************START RESTART STOP STATUS & VIEW****
+//*********************************************************************************************START RESTART STOP STATUS VIEW VISITORS****
 $start=0; $restart=0; $stop=0; $status=0; $view=0; $config=0;
 if(isset($args['start'])) {
 	if($args['start']==1) $start=$instances; else $start=explode(',',str_replace('"','',trim($args['start'])));
@@ -297,6 +297,9 @@ if(isset($args['status'])) {
 }
 if(isset($args['view'])) {
 	if($args['view']==1) $view=1; else $view=explode(',',str_replace('"','',trim($args['view'])));
+}
+if(isset($args['visitors'])) {
+	if($args['visitors']==1) $visitors=1; else $visitors=explode(',',str_replace('"','',trim($args['visitors'])));
 }
 
 
@@ -676,9 +679,19 @@ if($view) {
 
 	`tmux select-window -t $tsn:$index; tmux attach-session -t $tsn`;
 }
-
-
-
+//****************************************************************************************************SHOW VISITORS TO INSTANCE(S)****
+if(is_array($visitors)) {
+	foreach($visitors as $vi) if(!in_array($vi,$instances)) die(sprintf("An instance named '%s' was not found! Use --inst to show possible instance names.\n",$vi));
+	$instances=$visitors;
+	foreach($instances as $inst) {
+		$logpath=sprintf(LOGS_DIR,$inst).'OpenSim.log';
+		printf("******** Visitor Log for Instance: '%s' ********\n",$inst);
+		$cmd=sprintf('cat %s |awk \'/\\[SCENE\\]: Found presence/{print $1 " " $2 " " $15 " " $9 " " $10 " " $11}\'',$logpath);
+		passthru($cmd);
+		print "\n";
+	}
+}
+//****************************************************************************************************USAGE****
 function usage() {
 	return "
 opensim.sh.php [--option|--option[=]value]
@@ -771,6 +784,10 @@ spaces.
            Switch to the console display and optionally select the window for
            the instance InstanceName. The console display(s) run in TMUX, and
            the usual TMUX keys are used to switch panes, scroll and exit etc.
+
+--visitors [InstanceName[,InstanceName]...]
+           Show the visitors that have arrived at the regions hosted by the
+           named instances.
 
 --config [InstanceName[,InstanceName]...]
            Show the running config of all or just the named instances. An
