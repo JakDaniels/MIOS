@@ -284,7 +284,7 @@ if(isset($args['restart'])) {
 	if($args['restart']==1) $restart=$instances; else $restart=explode(',',str_replace('"','',trim($args['restart'])));
 }
 if(isset($args['stop'])) {
-	if($args['stop']==1)$stop=$instances; else $stop=explode(',',str_replace('"','',trim($args['stop'])));
+	if($args['stop']==1) $stop=$instances; else $stop=explode(',',str_replace('"','',trim($args['stop'])));
 }
 
 if(($start and $restart) or ($start and $stop) or ($restart and $stop)) die("Options --start --restart or --stop cannot be used together!\n");
