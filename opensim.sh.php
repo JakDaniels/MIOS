@@ -276,7 +276,7 @@ if(isset($args['rename-region'])) {
 
 
 //*********************************************************************************************START RESTART STOP STATUS VIEW VISITORS****
-$start=0; $restart=0; $stop=0; $status=0; $view=0; $config=0;
+$start=0; $restart=0; $stop=0; $status=0; $view=0; $config=0; $visitors=0;
 if(isset($args['start'])) {
 	if($args['start']==1) $start=$instances; else $start=explode(',',str_replace('"','',trim($args['start'])));
 }
@@ -299,7 +299,7 @@ if(isset($args['view'])) {
 	if($args['view']==1) $view=1; else $view=explode(',',str_replace('"','',trim($args['view'])));
 }
 if(isset($args['visitors'])) {
-	if($args['visitors']==1) $visitors=1; else $visitors=explode(',',str_replace('"','',trim($args['visitors'])));
+	if($args['visitors']==1) $visitors=$instances; else $visitors=explode(',',str_replace('"','',trim($args['visitors'])));
 }
 
 
