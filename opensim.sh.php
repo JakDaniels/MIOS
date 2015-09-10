@@ -688,9 +688,9 @@ if(is_array($visitors)) {
 		printf("******** Visitor Log for Instance: '%s' ********\n",$inst);
 		$cmd=sprintf('cat %s |awk \'/\\[SCENE\\\]: Found presence/{print $1 " " $2 " " $15 " " $9 " " $10 " " $11}\' >/tmp/visitors.txt',$logpath);
 		`$cmd`;
-		$cmd=sprintf('cat %s |awk \'/\\[SCENE\\]: Region .+ authenticated and authorized incoming root agent/{print $1 " " $2 " " $8 " " $15 " " $16 " " $17}\'>>/tmp/visitors.txt',$logpath);
+		$cmd=sprintf('cat %s |awk \'/\\[SCENE\\]: Region .+ authenticated and authorized incoming root agent/{print $1 " " $2 " " $8 " " $15 " " $16 " " $17}\' >>/tmp/visitors.txt',$logpath);
 		`$cmd`;
-		$cmd="cat /tmp/visitors.txt |sort; rm -f /tmp/visitors.txt";
+		$cmd="cat /tmp/visitors.txt |sort";
 		passthru($cmd);
 		print "\n";
 	}
