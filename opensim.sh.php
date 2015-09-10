@@ -686,7 +686,7 @@ if(is_array($visitors)) {
 	foreach($instances as $inst) {
 		$logpath=sprintf(LOGS_DIR,$inst).'OpenSim.log';
 		printf("******** Visitor Log for Instance: '%s' ********\n",$inst);
-		$cmd=sprintf('cat %s |awk \'/\\[SCENE\\]: Found presence/{print $1 " " $2 " " $15 " " $9 " " $10 " " $11}\'',$logpath);
+		$cmd=sprintf('cat %s |awk \'/\\[SCENE\\]: Region /{print $1 " " $2 " " $8 " " $15 " " $16 " " $17}\'',$logpath);
 		passthru($cmd);
 		print "\n";
 	}
