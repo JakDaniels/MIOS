@@ -557,50 +557,63 @@ if($start) {
 
 		if($errors===0) {
 
-			printf("Starting Instance: %s",$inst);
-			$entry=sprintf("%s\t%s\t%s",$inst,$rs,$base_port[$inst]);
-			$pidpath=sprintf(LOGS_DIR,$inst).'OpenSim.pid';
-			$cstatus='stopped'; //default if no entry found
-			$timer=0;
+			if($manual) {
 
-			while(1) {
-				$rl=read_text_file_to_array_with_lock($runlist,LOCK_EX);
-				for($i=0;$i<count($rl);$i++) {
-					if(substr($rl[$i],0,strlen($entry))==$entry) {
-						$cstatus=trim(substr($rl[$i],strlen($entry)));
-						if($cstatus=='') $cstatus='stopped';
+				printf("Manually Starting Instance: %s",$inst);
+				$c_inipath=sprintf(OUT_CONF_DIR,$inst).'combined.ini';
+				$e_inipath=sprintf(OUT_CONF_DIR,$inst).'empty.ini';
+				$pidpath=sprintf(LOGS_DIR,$inst).'OpenSim.pid';
+				$cmd=sprintf("%s \"%s\" \"%s\" \"%s\"\n",OS_EXEC,$e_inipath,$c_inipath,$pidpath);
+				passthru($cmd);
+				printf("Manually Ended Instance: %s",$inst);
+
+			} else {
+
+				printf("Starting Instance: %s",$inst);
+				$entry=sprintf("%s\t%s\t%s",$inst,$rs,$base_port[$inst]);
+				$pidpath=sprintf(LOGS_DIR,$inst).'OpenSim.pid';
+				$cstatus='stopped'; //default if no entry found
+				$timer=0;
+
+				while(1) {
+					$rl=read_text_file_to_array_with_lock($runlist,LOCK_EX);
+					for($i=0;$i<count($rl);$i++) {
+						if(substr($rl[$i],0,strlen($entry))==$entry) {
+							$cstatus=trim(substr($rl[$i],strlen($entry)));
+							if($cstatus=='') $cstatus='stopped';
+							break;
+						}
+					}
+					if($cstatus=='broken') {
+						if(isset($args['f']) or isset($args['fixed'])) $cstatus='stopped';
+						else {
+							print "\r\t\t\t\t\t\t[FAILED] Instance appears to be broken! Use -f to force start.\n";
+							printf("\tor to try a manual unmanaged start you can invoke the instance with: %s \"%s\" \"%s\" \"%s\"\n",OS_EXEC,$e_inipath,$c_inipath,$pidpath);
+							break;
+						}
+					}
+					if($cstatus=='started') {
+						print "\r\t\t\t\t\t\t[  OK  ]\n";
 						break;
 					}
-				}
-				if($cstatus=='broken') {
-					if(isset($args['f']) or isset($args['fixed'])) $cstatus='stopped';
-					else {
-						print "\r\t\t\t\t\t\t[FAILED] Instance appears to be broken! Use -f to force start.\n";
-						printf("\tor to try a manual unmanaged start you can invoke the instance with: %s \"%s\" \"%s\" \"%s\"\n",OS_EXEC,$e_inipath,$c_inipath,$pidpath);
+					if($cstatus=='stopped') {
+						$rl[$i]=sprintf("%s\t%s\t%s\t%s",$inst,$rs,$base_port[$inst],'start');
+						sort($rl);
+						write_text_file_from_array_with_lock($runlist,$rl,LOCK_EX);
+					}
+					if($cstatus=='stop') {
+						print "\r\t\t\t\t\t\t[FAILED] Instance is still stopping!\n";
+						printf("\tTo try a manual unmanaged start you can invoke the instance with: %s \"%s\" \"%s\" \"%s\"\n",OS_EXEC,$e_inipath,$c_inipath,$pidpath);
 						break;
 					}
-				}
-				if($cstatus=='started') {
-					print "\r\t\t\t\t\t\t[  OK  ]\n";
-					break;
-				}
-				if($cstatus=='stopped') {
-					$rl[$i]=sprintf("%s\t%s\t%s\t%s",$inst,$rs,$base_port[$inst],'start');
-					sort($rl);
-					write_text_file_from_array_with_lock($runlist,$rl,LOCK_EX);
-				}
-				if($cstatus=='stop') {
-					print "\r\t\t\t\t\t\t[FAILED] Instance is still stopping!\n";
-					printf("\tTo try a manual unmanaged start you can invoke the instance with: %s \"%s\" \"%s\" \"%s\"\n",OS_EXEC,$e_inipath,$c_inipath,$pidpath);
-					break;
-				}
-				sleep(2);
-				$timer+=2;
-				print ".";
-				if($timer>=TIMEOUT) {
-					printf("\r\t\t\t\t\t\t[FAILED] Instance did not start within %s seconds!\n",TIMEOUT);
-					printf("\tTo try a manual unmanaged start you can invoke the instance with: %s \"%s\" \"%s\" \"%s\"\n",OS_EXEC,$e_inipath,$c_inipath,$pidpath);
-					break;
+					sleep(2);
+					$timer+=2;
+					print ".";
+					if($timer>=TIMEOUT) {
+						printf("\r\t\t\t\t\t\t[FAILED] Instance did not start within %s seconds!\n",TIMEOUT);
+						printf("\tTo try a manual unmanaged start you can invoke the instance with: %s \"%s\" \"%s\" \"%s\"\n",OS_EXEC,$e_inipath,$c_inipath,$pidpath);
+						break;
+					}
 				}
 			}
 		}
@@ -775,9 +788,12 @@ spaces.
            one Region to the instance in order to be able to start and stop the
            instance.
 
---start [InstanceName[,InstanceName]...]
+--start [InstanceName[,InstanceName]...] [--manual]
            Attempt to start all or just the named instances. If an instance for
            some reason does not start in a timely manner, it will show [FAILED].
+           If --manual is specified then the instance will be started manually
+           from the current shell and will run in interactive mode until
+           shutdown from the OpenSim console.
 
 --stop [InstanceName[,InstanceName]...]
            Attempt to stop all or just the named instances. If an instance for
