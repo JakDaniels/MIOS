@@ -234,7 +234,7 @@ if(isset($args['add-region'])) {
 	if(isset($args['size'])) {
 		if(!try_parse_size($args['size'],$size)) die("Size must be a multiple of 256!\n");
 	} else {
-		if($debug) print "- Setting region size to 256 (256x256m)\n");
+		if($debug) print "- Setting region size to 256 (256x256m)\n";
 	}
 
 	// now create (or add to) the basic region config
