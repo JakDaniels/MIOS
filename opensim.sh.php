@@ -560,13 +560,13 @@ if($start) {
 
 			if($manual) {
 
-				printf("Manually Starting Instance: %s",$inst);
+				//printf("Manually Starting Instance: %s",$inst);
 				$c_inipath=sprintf(OUT_CONF_DIR,$inst).'combined.ini';
 				$e_inipath=sprintf(OUT_CONF_DIR,$inst).'empty.ini';
 				$pidpath=sprintf(LOGS_DIR,$inst).'OpenSim.pid';
 				$cmd=sprintf("%s \"%s\" \"%s\" \"%s\"\n",OS_EXEC,$e_inipath,$c_inipath,$pidpath);
-				passthru($cmd);
-				printf("Manually Ended Instance: %s",$inst);
+				print "Run this command: $cmd";
+				//printf("Manually Ended Instance: %s",$inst);
 
 			} else {
 
