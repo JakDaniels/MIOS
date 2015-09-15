@@ -242,7 +242,7 @@ if(isset($args['add-region'])) {
 	$rconfig=sprintf(CONFIGS_DIR,$inst).'Regions/Regions.ini';
 	if($debug) printf("- Reading config file: %s\n",$rconfig);
 	$rini=parse_ini($rconfig, true, INI_SCANNER_RAW) or array();
-	$rini[$region]=array('Location'=>'"'.$location.'"','RegionUUID'=>$uuid,'InternalPort'=>$port,'SizeX'=$size,'SizeY'=$size);
+	$rini[$region]=array('Location'=>'"'.$location.'"','RegionUUID'=>$uuid,'InternalPort'=>$port,'SizeX'=>$size,'SizeY'=>$size);
 	if(!write_ini($rconfig,$rini)) die("ERROR: Could not write ini file $rconfig !\n");
 	if($debug) printf("* Updated Region config %s.\n",$rconfig);
 	printf("Region %s was created in Instance %s with UUID %s on port %d.\n",$region,$inst,$uuid,$port);
