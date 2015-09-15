@@ -822,7 +822,8 @@ MAX_RESTART_COUNT times of trying, the instance will be marked as broken.
            Optional Parameters (values auto generated if not specified):
   [--uuid xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx]  UUID of the new Region
   [--port pppp]             Port number the Region listens on
-
+  [--size xxx]              Size of the region in multiples of 256. Defaults to
+                            256 (256x256m)
 
 --rename-region NewRegionName
            Required parameters:
