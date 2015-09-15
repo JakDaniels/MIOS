@@ -24,6 +24,15 @@ function try_parse_port($port,&$out) {
 	return 0;
 }
 
+function try_parse_size($size, &$out) {
+	$sizes=array(256,512,768,1024,1280,1536,1792,2048,2304,2560,2816,3072,3328,3584,3840,4096);
+	if(in_array($size,$sizes)) {
+		$out=$size;
+		return 1;
+	}
+	return 0;
+}
+
 function get_instance_status($rl,$inst,$base_port) {
 	$rs=str_replace(" ","_",$inst); //replace spaces with _ in instance names for when we create the database and tmux windows
 	$entry=sprintf("%s\t%s\t%s",$inst,$rs,$base_port);

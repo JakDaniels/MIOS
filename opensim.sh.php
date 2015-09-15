@@ -230,12 +230,19 @@ if(isset($args['add-region'])) {
 		if($debug) printf("- Allocated new UUID %s to instance %s, region %s\n",$uuid,$inst,$region);
 	}
 
+	$size=256;
+	if(isset($args['size'])) {
+		if(!try_parse_size($args['size'],$size)) die("Size must be a multiple of 256!\n");
+	} else {
+		if($debug) print "- Setting region size to 256 (256x256m)\n");
+	}
+
 	// now create (or add to) the basic region config
 	make_instance_directories($inst);
 	$rconfig=sprintf(CONFIGS_DIR,$inst).'Regions/Regions.ini';
 	if($debug) printf("- Reading config file: %s\n",$rconfig);
 	$rini=parse_ini($rconfig, true, INI_SCANNER_RAW) or array();
-	$rini[$region]=array('Location'=>'"'.$location.'"','RegionUUID'=>$uuid,'InternalPort'=>$port);
+	$rini[$region]=array('Location'=>'"'.$location.'"','RegionUUID'=>$uuid,'InternalPort'=>$port,'SizeX'=$size,'SizeY'=$size);
 	if(!write_ini($rconfig,$rini)) die("ERROR: Could not write ini file $rconfig !\n");
 	if($debug) printf("* Updated Region config %s.\n",$rconfig);
 	printf("Region %s was created in Instance %s with UUID %s on port %d.\n",$region,$inst,$uuid,$port);
