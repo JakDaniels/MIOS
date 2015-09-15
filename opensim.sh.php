@@ -286,7 +286,7 @@ if(isset($args['rename-region'])) {
 $start=0; $restart=0; $stop=0; $status=0; $view=0; $config=0; $visitors=0; $manual=0;
 if(isset($args['start'])) {
 	if($args['start']==1) $start=$instances; else $start=explode(',',str_replace('"','',trim($args['start'])));
-	if($args['manual']==1) $manual=1;
+	if(isset($args['manual'])) $manual=1;
 }
 if(isset($args['restart'])) {
 	if($args['restart']==1) $restart=$instances; else $restart=explode(',',str_replace('"','',trim($args['restart'])));
