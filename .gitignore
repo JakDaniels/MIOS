@@ -1,6 +1,5 @@
 *~
 *.swp
-*.tws
 Instances/*/*/*
 !Instances/.config/*/*
 Instances/.config/.runlist
