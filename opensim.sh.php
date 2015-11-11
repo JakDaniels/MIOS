@@ -62,6 +62,15 @@ if(isset($args['os-update'])) {
 	exit(0);
 }
 //****************************************************************************************************UPDATE/INSTALL OPENSIM****
+if(isset($args['rebuild'])) {
+	if(file_exists(BIN_DIR)) {
+		$cmd='cd '.OS_ROOT_DIR.'; ./runprebuild.sh autoclean && ./runprebuild.sh vs2010 && xbuild /p:Configuration=Release;';
+		if($debug) printf("Running: %s\n",$cmd);
+		passthru($cmd);
+	}
+	exit(0);
+}
+//****************************************************************************************************UPDATE/INSTALL OPENSIM****
 if(isset($args['recompile'])) {
 	if(file_exists(BIN_DIR)) {
 		$cmd='cd '.OS_ROOT_DIR.'; xbuild /p:Configuration=Release;';
@@ -813,13 +822,26 @@ spaces.
              ./runprebuild.sh autoclean && ./runprebuild.sh vs2010 &&
              xbuild /p:Configuration=Release
 
-           for an initial install or:
+           ...if it's an initial install or:
 
            cd ~/opensim; git pull && xbuild /t:clean &&
              ./runprebuild.sh autoclean && ./runprebuild.sh vs2010 &&
              xbuild /p:Configuration=Release
 
-           for an update.
+           ...for an update.
+
+--rebuild
+           Same as above except don't attempt to update from git, just rebuild
+           the project and recompile. Equivalent to:
+
+           cd ~; ./runprebuild.sh autoclean && ./runprebuild.sh vs2010 &&
+             xbuild /p:Configuration=Release
+
+--recompile
+           Same as above except don't attempt to update from git, just do the
+           recompile step. Equivalent to:
+
+           cd ~; xbuild /p:Configuration=Release;
 
 --os-config [name[,name[,name]]]...
            Downloads configs from the web for a named grid, where the filenames
