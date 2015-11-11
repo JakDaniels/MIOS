@@ -23,8 +23,9 @@
 															'pwd'		=>'xxxxx')
 	);
 	
-	//where are grid wide configs downloaded from?
-	$gridconfigs['osgrid'] = array(
+	//Configs: here we list all the places that we get configs from. These may be standalone or grid
+	//configurtions, each instance will use the named config set as its base.
+	$osconfigs['osgrid'] = array(
 		'OpenSim.ini'				=> 'http://download.osgrid.org/OpenSim.ini.txt',
 		'config-include/GridCommon.ini'		=> 'http://download.osgrid.org/GridCommon.ini.txt',
 		'config-include/FlotsamCache.ini'	=> 'http://download.osgrid.org/FlotsamCache.ini.txt'
