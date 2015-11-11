@@ -49,6 +49,22 @@ function get_instance_status($rl,$inst,$base_port) {
 	return $cstatus;
 }
 
+function get_instance_config_set($inst) {
+	$cset=@file(sprintf("%s%s/.config_set",BASE_DIR,$inst));
+	$cs=trim($cset[0]);
+	if($cs=='') $cs=DEFAULT_CONFIG_SET;
+	return $cs;
+}
+
+function set_instance_config_set($inst,$set) {
+	if($fp=fopen(sprintf("%s%s/.config_set",BASE_DIR,$inst))) {
+		fwrite($fp,$set);
+		fclose($fp);
+		return 1;
+	}
+	return 0;
+}
+
 function find_region_by_uuid($info,$uuid) {
 	foreach($info as $region) {
 		$ruuid=str_replace(array('"',' '),'',$region['RegionUUID']);
@@ -78,7 +94,7 @@ function enum_instances() {
 	return $instances;
 }
 
-function enum_instance($inst,&$used_ports,&$used_uuids,&$base_port,&$regions_list) {
+function enum_instance($inst,&$used_ports,&$used_uuids,&$base_port,&$regions_list,&$config_set) {
 	global $debug;
 	$dconfig=BASE_CONFIGS.'Regions/Regions.ini';
 	if($debug) printf("- Reading config file: %s\n",$dconfig);
@@ -170,7 +186,7 @@ function enum_instance($inst,&$used_ports,&$used_uuids,&$base_port,&$regions_lis
 		if($debug) printf("* Wrote Region config %s.\n",$oconfig);
 
 	}
-
+	$config_set=get_instance_config_set($inst); //which config set does this instance use?
 	return $info;
 }
 

@@ -4,6 +4,7 @@ error_reporting (E_ALL);
 define('HOME_DIR',trim(`echo ~`));
 define('BASE_DIR',HOME_DIR.'/MIOS/Instances/');
 define('BASE_CONFIGS',BASE_DIR.'.config/');
+define('CONFIG_SETS',BASE_DIR.'.config/ConfigSets/');
 define('CONFIGS_DIR',BASE_DIR.'%s/Configs/');
 define('LOGS_DIR',BASE_DIR.'%s/Logs/');
 define('SCRIPTS_DIR',BASE_DIR.'%s/ScriptEngines/');
@@ -60,16 +61,33 @@ if(isset($args['os-update'])) {
 	}
 	exit(0);
 }
+//****************************************************************************************************UPDATE/INSTALL OPENSIM****
+if(isset($args['recompile'])) {
+	if(file_exists(BIN_DIR)) {
+		$cmd='cd '.OS_ROOT_DIR.'; xbuild /p:Configuration=Release;';
+		if($debug) printf("Running: %s\n",$cmd);
+		passthru($cmd);
+	}
+	exit(0);
+}
 //**************************************************************************************UPDATE/INSTALL OPENSIM GRID CONFIGS****
-if(isset($args['grid-config'])) {
-	$grid=$args['grid-config'];
-	if(isset($gridconfigs[$grid])) {
-		foreach($gridconfigs[$grid] as $k=>$v) {
-			$cmd="wget -O ".BASE_CONFIGS."$k $v";
-			if($debug) printf("Running: %s\n",$cmd);
-			passthru($cmd);
-		}
-	} else die("Could not find a section in the config for retrieving configs from '$grid'.\n");
+if(isset($args['os-config'])) {
+	if($args['os-config']==1) $osconfs=array_keys($osconfigs); //use all config sets if none specified
+	else $osconfs=explode(",", $args['os-config']);
+	foreach($osconfs as $c) {
+		print "Staring retrieval of config set '$c'...\n";
+		if(isset($osconfigs[$c])) {
+			@mkdir(CONFIG_SETS);
+			@mkdir(CONFIG_SETS."$c/");
+			@mkdir(CONFIG_SETS."$c/config-include/");
+			foreach($osconfigs[$c] as $k=>$v) {
+				if(substr($v,0,7)=="http://") $cmd="wget -O ".CONFIG_SETS."$c/$k $v";
+				else $cmd="/bin/cp -fv $v ".CONFIG_SETS."$c/$k";
+				if($debug) printf("Running: %s\n",$cmd);
+				passthru($cmd);
+			}
+		} else die("Could not find a section in the main config that describes the source for opensim configs of type '$c'.\n");
+	}
 }
 //****************************************************************************************************SETUP MYSQL DB USERS****
 if(isset($args['init-mysql'])) {
@@ -127,7 +145,14 @@ if(isset($args['add-instance'])) {
 	$inst=$args['add-instance'];
 	if($inst===1) die("You must specify an instance name to add!\n");
 	if(in_array($inst,$instances)) die("An Instance of that name already exists!\n");
+
+	if(isset($args['config-set'])) $cs=$args['config-set'];
+	else $cs=DEFAULT_CONFIG_SET;
+	if(!in_array($cs,array_keys(osconfigs))) {
+		die(sprintf("A config set '%s' does not exist! Valid sets are: %s",$cs,implode(",",array_keys(osconfigs))));
+	}
 	@mkdir(BASE_DIR.$inst);
+	set_instance_config_set($inst,$cs);
 	@mkdir(sprintf(OUT_CONF_DIR,$inst));
 	@mkdir(sprintf(OUT_CONF_DIR.'Regions/',$inst));
 	@mkdir(sprintf(SCRIPTS_DIR,$inst));
@@ -135,7 +160,7 @@ if(isset($args['add-instance'])) {
 	print "The Instance configs were generated successfully! Use --add-region now to add regions to this instance.\n";
 	exit(0);
 }
-
+//******************************************************************************************************************************
 //everything below here requires some instances to be configured!
 if(count($instances)<1) die("There are no Opensim Instances Configured! Use --add-instance to start.\n");
 
@@ -143,7 +168,7 @@ if(count($instances)<1) die("There are no Opensim Instances Configured! Use --ad
 //****************************************************************************************************LIST INSTANCES*************
 if(isset($args['inst'])) {
 	print "Configured Instances:\n";
-	foreach($instances as $li) print $li."\n";
+	foreach($instances as $li) printf("'%s' using base config set for '%s'\n",$li,get_instance_config_set($li));
 	exit(0);
 }
 //****************************************************************************************************LIST INSTANCE(S) & REGIONS***
@@ -155,13 +180,18 @@ if(isset($args['list'])) {
 	$base_port=array();
 	$regions_list=array();
 	$rl=read_text_file_to_array_with_lock($runlist,LOCK_EX);
-	foreach($list as $inst) $info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list);
+	$config_set='';
+	foreach($list as $inst) $info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list,$config_set);
+	$config_set='';
 	foreach($list as $inst) {
 		$cstatus=get_instance_status($rl,$inst,$base_port[$inst]);
 		if(!count($regions_list[$inst])) $cstatus.='/unconfigured';
-		print "\n".pad_clip_string(sprintf("+-Instance: %s---",$inst),61,'-','-')."+  *".$cstatus."\n";
+		$cs=get_instance_config_set($inst);
+		print "\n".pad_clip_string(sprintf("+-Instance: %s---",$inst),61,'-','-');
+		print pad_clip_string(sprintf("+-Config Set: %s-",$cs),25,'-','-')."+  *".$cstatus."\n";
+
 		print pad_clip_string('+',61,'-','-').pad_clip_string('+',37,'-','-')."+\n|";
-		$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list);
+		$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list,$config_set);
 		$h=array('RegionName'=>20,'RegionUUID'=>37,'GridLocation'=>15,'Port'=>6,'Size'=>10);
 		foreach($h as $t=>$s) print " ".pad_clip_string($t,$s)."|";
 		print "\n".pad_clip_string('+',98,'-','-')."+\n";
@@ -194,20 +224,26 @@ if(isset($args['add-region'])) {
 	$base_port=array();
 	$regions_list=array();
 	$locations=array();
-	foreach($instances as $inst) {
-		$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list);
-		foreach($info as $i) {
-			if($location==str_replace(array(' ','"'),'',$i['Location'])) die("That Grid Location is already in use by another region!\n");
-			if($region==$i['RegionName']) die("A region by that name already exists in this or another instance!\n");
-		}
-	}
+
 	if(isset($args['instance'])) {
-		$inst=$args['instance'];
-		if(!in_array($inst,$instances)) die("You must specify a valid instance name that this region should be added to!\n");
+		$instance=$args['instance'];
+		if(!in_array($instance,$instances)) die("You must specify a valid instance name that this region should be added to!\n");
 		$rl=read_text_file_to_array_with_lock($runlist,LOCK_EX);
-		$cstatus=get_instance_status($rl,$inst,$base_port[$inst]);
+		$cstatus=get_instance_status($rl,$instance,$base_port[$inst]);
 		if($cstatus!='stopped') die("This instance must be stopped before you can add a region!\n");
 	} else die("You must specify an instance name using --instance that this region should be added to!\n");
+
+	$instance_config_set=get_instance_config_set($instance);
+	$config_set='';
+	foreach($instances as $inst) {
+		$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list,$config_set);
+		if($config_set==$instance_config_set) { //locations can be the same on different standalones/grids
+			foreach($info as $i) {
+				if($location==str_replace(array(' ','"'),'',$i['Location'])) die("That Grid Location is already in use by another region!\n");
+				if($region==$i['RegionName']) die("A region by that name already exists in this or another instance!\n");
+			}
+		}
+	}
 
 	if(isset($args['port'])) {
 		$port=0;
@@ -216,8 +252,8 @@ if(isset($args['add-region'])) {
 	} else {
 		$port=INSTANCE_MIN_PORT;
 		while(in_array($port,$used_ports) and $port<INSTANCE_MAX_PORT) $port++;
-		if($port>INSTANCE_MAX_PORT) die(sprintf("Could not allocate a port to instance %s, region %s!\n",$inst,$region));
-		if($debug) printf("- Allocated new port %d to instance %s, region %s\n",$port,$inst,$region);
+		if($port>INSTANCE_MAX_PORT) die(sprintf("Could not allocate a port to instance %s, region %s!\n",$instance,$region));
+		if($debug) printf("- Allocated new port %d to instance %s, region %s\n",$port,$instance,$region);
 	}
 
 	if(isset($args['uuid'])) {
@@ -227,7 +263,7 @@ if(isset($args['add-region'])) {
 	} else {
 		$uuid=create_uuid();
 		while(in_array($uuid,$used_uuids)) $uuid=create_uuid();
-		if($debug) printf("- Allocated new UUID %s to instance %s, region %s\n",$uuid,$inst,$region);
+		if($debug) printf("- Allocated new UUID %s to instance %s, region %s\n",$uuid,$instance,$region);
 	}
 
 	$size=256;
@@ -238,14 +274,14 @@ if(isset($args['add-region'])) {
 	}
 
 	// now create (or add to) the basic region config
-	make_instance_directories($inst);
-	$rconfig=sprintf(CONFIGS_DIR,$inst).'Regions/Regions.ini';
+	make_instance_directories($instance);
+	$rconfig=sprintf(CONFIGS_DIR,$instance).'Regions/Regions.ini';
 	if($debug) printf("- Reading config file: %s\n",$rconfig);
 	$rini=parse_ini($rconfig, true, INI_SCANNER_RAW) or array();
 	$rini[$region]=array('Location'=>'"'.$location.'"','RegionUUID'=>$uuid,'InternalPort'=>$port,'SizeX'=>$size,'SizeY'=>$size);
 	if(!write_ini($rconfig,$rini)) die("ERROR: Could not write ini file $rconfig !\n");
 	if($debug) printf("* Updated Region config %s.\n",$rconfig);
-	printf("Region %s was created in Instance %s with UUID %s on port %d.\n",$region,$inst,$uuid,$port);
+	printf("Region %s was created in Instance %s with UUID %s on port %d.\n",$region,$instance,$uuid,$port);
 
 }
 //****************************************************************************************************RENAME REGION***********
@@ -262,8 +298,9 @@ if(isset($args['rename-region'])) {
 	$used_uuids=array();
 	$base_port=array();
 	$regions_list=array();
+	$config_set='';
 	foreach($instances as $inst) {
-		$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list);
+		$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list,$config_set);
 		if($found=find_region_by_uuid($info,$uuid)) break;
 	}
 	if(!$found)	die("That region UUID could not be found in any instance!\n");
@@ -338,8 +375,9 @@ if($stop) {
 	$used_uuids=array();
 	$base_port=array();
 	$regions_list=array();
+	$config_set='';
 	foreach($instances as $inst) {
-		$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list);
+		$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list,$config_set);
 	}
 
 	// make sure that the os_runner daemon is running
@@ -428,8 +466,9 @@ if($start) {
 	$used_uuids=array();
 	$base_port=array();
 	$regions_list=array();
+	$config_set='';
 	foreach($instances as $inst) {
-		$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list);
+		$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list,$config_set);
 	}
 
 	// make sure that the os_runner daemon is running
@@ -632,8 +671,9 @@ if($config) {
 	$used_uuids=array();
 	$base_port=array();
 	$regions_list=array();
+	$config_set='';
 	foreach($instances as $inst) {
-		$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list);
+		$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list,$config_set);
 	}
 	foreach($instances as $inst) {
 		$c_inipath=sprintf(OUT_CONF_DIR,$inst).'combined.ini';
@@ -668,8 +708,9 @@ if($status) {
 	$used_uuids=array();
 	$base_port=array();
 	$regions_list=array();
+	$config_set='';
 	foreach($instances as $inst) {
-		$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list);
+		$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list,$config_set);
 	}
 	$runlist=BASE_CONFIGS.'.runlist';
 	$rl=read_text_file_to_array_with_lock($runlist,LOCK_EX);
@@ -692,8 +733,9 @@ if($view) {
 		$used_uuids=array();
 		$base_port=array();
 		$regions_list=array();
+		$config_set='';
 		foreach($instances as $inst) {
-			$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list);
+			$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list,$config_set);
 		}
 		$index=$base_port[$instances[0]];
 	} else $index=0;
@@ -706,14 +748,43 @@ if(is_array($visitors)) {
 	$instances=$visitors;
 	foreach($instances as $inst) {
 		$logpath=sprintf(LOGS_DIR,$inst).'OpenSim.log';
+		if($debug) printf("Checking log: %s\n",$logpath);
 		printf("******** Visitor Log for Instance: '%s' ********\n",$inst);
-		$cmd=sprintf('cat %s |awk \'/\\[SCENE\\]: Found presence/{print $1 " " $2 " " $15 " " $9 " " $10 " " $11}\' >/tmp/visitors.txt',$logpath);
+		$visits=array();
+
+		/* old way, prone to failure if log format changes
+		$cmd=sprintf('cat %s |awk \'/\\[SCENE\\]: Found presence/{print $1 " " $2 " " $17 " " $11 " " $12 " " $13}\' >/tmp/visitors.txt',$logpath);
+		if($debug) printf("Running: %s\n",$cmd);
 		`$cmd`;
-		$cmd=sprintf('cat %s |awk \'/\\[SCENE\\]: Region .+ authenticated and authorized incoming root agent/{print $1 " " $2 " " $8 " " $15 " " $16 " " $17}\' >>/tmp/visitors.txt',$logpath);
+		$cmd=sprintf('cat %s |awk \'/\\[SCENE\\]: Region .+ authenticated and authorized incoming root agent/{print $1 " " $2 " " $10 " " $17 " " $18 " " $19}\' >>/tmp/visitors.txt',$logpath);
+		if($debug) printf("Running: %s\n",$cmd);
 		`$cmd`;
 		$cmd="cat /tmp/visitors.txt |sort";
 		passthru($cmd);
-		print "\n";
+		print "\n"; */
+
+		//new way uses preg_match
+		if($fp=@fopen($logpath,'r')) {
+			while(!feof($fp)) {
+				$line=trim(fgets($fp));
+				//match rule #1
+				if(preg_match("/([0-9\-]{10}\ [0-9:,]{12}).*?\[SCENE\]:\ Region\ (.*?)\ authenticated\ .*?agent\ ([^\ ]+)\ ([^\ ]+)\ ([0-9a-f\-]{36})/",$line,$m)) {
+					$visits[$m[1]]=array('Region'=>$m[2],'AvatarFirst'=>$m[3],'AvatarLast'=>$m[4],'UUID'=>$m[5],'Rule'=>'#1');
+				}
+				//match rule #2
+				//if(preg_match("/([0-9\-]{10}\ [0-9:,]{12}).*?\[SCENE\]:\ Found\ presence\ ([^\ ]+)\ ([^\ ]+)\ ([0-9a-f\-]{36})\ as\ root\ in\ (.*?)\ after/",$line,$m)) {
+				//	$visits[$m[1]]=array('Region'=>$m[5],'AvatarFirst'=>$m[2],'AvatarLast'=>$m[3],'UUID'=>$m[4],'Rule'=>'#2');
+				//}
+			}
+			@fclose($fp);
+			ksort($visits);
+			foreach($visits as $k=>$v) {
+				printf("%s\t%s\t%s\t%s\t%s\t%s\n",$k,$v['Region'],$v['AvatarFirst'],$v['AvatarLast'],$v['UUID'],$v['Rule']);
+			}
+		}
+
+
+
 	}
 }
 //****************************************************************************************************USAGE****
@@ -750,10 +821,11 @@ spaces.
 
            for an update.
 
---grid-config name
+--os-config [name[,name[,name]]]...
            Downloads configs from the web for a named grid, where the filenames
-           and web urls are listed in the MIOS configuration. See the example
-           config.ini.example file for OSGrid configs
+           and web urls are listed in the MIOS configuration, *OR* copy files
+           from another directory. See the config.ini.example file for example
+           OSGrid and standalone config source definitions.
 
 --init-mysql
            Add the two users to Mysql that are required to manage and run
@@ -788,6 +860,9 @@ spaces.
            are required to control that instance. You will need to add at least
            one Region to the instance in order to be able to start and stop the
            instance.
+     [--config-set ConfigSetName] Specifies which set of *base* configs we will
+           use for this instance. These can be grid or standalone config sets
+           and the sources for those configs are defined in config.inc.php.
 
 --start [InstanceName[,InstanceName]...] [--manual]
            Attempt to start all or just the named instances. If an instance for
