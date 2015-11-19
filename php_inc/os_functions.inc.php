@@ -57,7 +57,7 @@ function get_instance_config_set($inst) {
 }
 
 function set_instance_config_set($inst,$set) {
-	if($fp=fopen(sprintf("%s%s/.config_set",BASE_DIR,$inst))) {
+	if($fp=fopen(sprintf("%s%s/.config_set",BASE_DIR,$inst),'wb')) {
 		fwrite($fp,$set);
 		fclose($fp);
 		return 1;

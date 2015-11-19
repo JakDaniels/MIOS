@@ -157,10 +157,13 @@ if(isset($args['add-instance'])) {
 
 	if(isset($args['config-set'])) $cs=$args['config-set'];
 	else $cs=DEFAULT_CONFIG_SET;
-	if(!in_array($cs,array_keys(osconfigs))) {
+	if(!in_array($cs,array_keys($osconfigs))) {
 		die(sprintf("A config set '%s' does not exist! Valid sets are: %s",$cs,implode(",",array_keys(osconfigs))));
 	}
 	@mkdir(BASE_DIR.$inst);
+	@mkdir(sprintf(CONFIGS_DIR,$inst));
+	@mkdir(sprintf(CONFIGS_DIR.'Overrides',$inst));
+	@mkdir(sprintf(CONFIGS_DIR.'Regions',$inst));
 	set_instance_config_set($inst,$cs);
 	@mkdir(sprintf(OUT_CONF_DIR,$inst));
 	@mkdir(sprintf(OUT_CONF_DIR.'Regions/',$inst));
@@ -238,7 +241,7 @@ if(isset($args['add-region'])) {
 		$instance=$args['instance'];
 		if(!in_array($instance,$instances)) die("You must specify a valid instance name that this region should be added to!\n");
 		$rl=read_text_file_to_array_with_lock($runlist,LOCK_EX);
-		$cstatus=get_instance_status($rl,$instance,$base_port[$inst]);
+		$cstatus=get_instance_status($rl,$instance,$base_port[$instance]);
 		if($cstatus!='stopped') die("This instance must be stopped before you can add a region!\n");
 	} else die("You must specify an instance name using --instance that this region should be added to!\n");
 
@@ -512,11 +515,17 @@ if($start) {
 																	'EstateDBName'=>ESTATE_DB,
 																	'ConfigBase'=>sprintf(CONFIGS_DIR,$inst)
 																		));
-		$inifiles=array(BASE_CONFIGS."OpenSimDefaults.ini",
-										BASE_CONFIGS."OpenSim.ini",
-										BASE_CONFIGS."config-include/GridHypergrid.ini",
-										BASE_CONFIGS."config-include/GridCommon.ini",
-										BASE_CONFIGS."config-include/FlotsamCache.ini");
+
+		//$inifiles=array(BASE_CONFIGS."OpenSimDefaults.ini",
+		//								BASE_CONFIGS."OpenSim.ini",
+		//								BASE_CONFIGS."config-include/GridHypergrid.ini",
+		//								BASE_CONFIGS."config-include/GridCommon.ini",
+		//								BASE_CONFIGS."config-include/FlotsamCache.ini");
+
+		$cs=get_instance_config_set($inst);
+		foreach($osconfigs[$cs] as $config_dst=>$config_src) {
+			$inifiles[]=CONFIG_SETS."${cs}/${config_dst}";
+		}
 
 		foreach($inifiles as $inifile) {
 			if($debug) printf("- Reading config file: %s\n",$inifile);
