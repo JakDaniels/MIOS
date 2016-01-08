@@ -53,6 +53,8 @@
 	define('BULLET_IN_OWN_THREAD',1); //run bulletsim in it's own thread
 
 	define('REGION_NAMES_REGEX','/^[a-z0-9\ \_\-\*\(\)\!]+$/i'); //what are legal characeters in region names
+	
+	define('OPENSIM_GIT_REPOSITORY','git://opensimulator.org/git/opensim');
 
 	date_default_timezone_set('Europe/London');
 
