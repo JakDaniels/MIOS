@@ -2,8 +2,7 @@
 [Region Defaults]
 	InternalAddress = 0.0.0.0
 	AllowAlternatePorts = False
-;	ExternalHostName = "SYSTEMIP"
-	ExternalHostName = 87.127.21.54
+	ExternalHostName = "SYSTEMIP"
 	NonphysicalPrimMax = 1024
 	PhysicalPrimMax = 64
 	ClampPrimSize = False
