@@ -3,6 +3,7 @@
 *.ini
 Instances/*/*/*
 !Instances/.config/Overrides/*.ini.example
+!Instances/.config/Regions/*.ini.example
 !Instances/.config/ConfigSets/
 Instances/.config/.runlist
 Instances/.config/.pidfile
