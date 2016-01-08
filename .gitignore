@@ -1,6 +1,9 @@
 *~
 *.swp
+*.ini
 Instances/*/*/*
+!Instances/.config/Overrides/*.ini.example
+!Instances/.config/ConfigSets/
 Instances/.config/.runlist
 Instances/.config/.pidfile
 Instances/.config/config.inc.php

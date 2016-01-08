@@ -1,0 +1,4 @@
+[LandManagement]
+        LimitParcelLayerUpdateDistance = false
+        ParcelLayerViewDistance = 2048
+        
