@@ -52,7 +52,10 @@ function get_instance_status($rl,$inst,$base_port) {
 function get_instance_config_set($inst) {
 	$cset=@file(sprintf("%s%s/.config_set",BASE_DIR,$inst));
 	$cs=trim($cset[0]);
-	if($cs=='') $cs=DEFAULT_CONFIG_SET;
+	if($cs=='') {
+		$cs=DEFAULT_CONFIG_SET;
+		set_instance_config_set($inst,$cs);
+	}
 	return $cs;
 }
 
