@@ -51,7 +51,7 @@ foreach($dependencies as $d) if(!file_exists($d)) die("You are missing a depende
 //****************************************************************************************************UPDATE/INSTALL OPENSIM****
 if(isset($args['os-update'])) {
 	if(!file_exists(BIN_DIR)) { //no opensim is installed. Do a fresh git clone.
-		$cmd='cd '.HOME_DIR.'; git clone '.OPENSIM_GIT_REPOSITORY.' && cd '.OS_ROOT_DIR.'; && ./runprebuild.sh autoclean && ./runprebuild.sh vs2010 && xbuild /p:Configuration=Release';
+		$cmd='cd '.HOME_DIR.'; git clone '.OPENSIM_GIT_REPOSITORY.' && cd '.OS_ROOT_DIR.' && ./runprebuild.sh autoclean && ./runprebuild.sh vs2010 && xbuild /p:Configuration=Release';
 		if($debug) printf("Running: %s\n",$cmd);
 		passthru($cmd);
 	} else {
