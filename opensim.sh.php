@@ -404,6 +404,7 @@ if($stop) {
 		`exec $cmd`;
 	}
 
+	$stopped_instances=array(); //keep a list of which instances we successfully stopped in case we're restarting
 	foreach($instances as $inst) {
 
 		if(count($regions_list[$inst])==0) {
@@ -428,6 +429,7 @@ if($stop) {
 			}
 			if($cstatus=='stopped') {
 				print "\r\t\t\t\t\t\t[  OK  ]\n";
+				$stopped_instances[]=$inst;
 				break;
 			}
 			if($cstatus=='started') {
@@ -466,6 +468,7 @@ if($stop) {
 			@unlink($pidfile);
 		}
 	}
+	if($restart) $start=$stopped_instances; //only restart stopped instances
 }
 //****************************************************************************************************START INSTANCE(S)*************
 if($start) {
