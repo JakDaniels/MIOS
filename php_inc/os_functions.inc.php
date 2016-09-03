@@ -87,6 +87,16 @@ function make_instance_directories($inst) {
 	@mkdir(sprintf(LOGS_DIR,$inst));
 	@mkdir(sprintf(CONFIGS_DIR,$inst));
 	@mkdir(sprintf(CONFIGS_DIR.'Regions/',$inst));
+	@mkdir(sprintf(CONFIGS_DIR.'Overrides/',$inst));
+
+	if($fp=@fopen(sprintf(CONFIGS_DIR.'Regions/README.txt',$inst))) {
+		fwrite($fp,"Place .ini files here that contain named Region specific settings");
+		@fclose($fp);
+	}
+	if($fp=@fopen(sprintf(CONFIGS_DIR.'Overrides/README.txt',$inst))) {
+		fwrite($fp,"Place .ini files here that should override the main .ini setting for this instance only.");
+		@fclose($fp);
+	}
 }
 
 function enum_instances() {
