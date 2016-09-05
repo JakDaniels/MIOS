@@ -174,7 +174,38 @@ if(isset($args['add-instance'])) {
 //everything below here requires some instances to be configured!
 if(count($instances)<1) die("There are no Opensim Instances Configured! Use --add-instance to start.\n");
 
+//****************************************************************************************************DEL INSTANCE**************
+if(isset($args['del-instance'])) {
+	$inst=$args['del-instance'];
+	if($inst===1) die("You must specify an instance name to delete!\n");
+	if(!in_array($inst,$instances)) die("Couldn't find an Instance with that name! Use --list to get a list of instances.\n");
+	$used_ports=array();
+	$used_uuids=array();
+	$base_port=array();
+	$regions_list=array();
+	$rl=read_text_file_to_array_with_lock($runlist,LOCK_EX);
+	$config_set='';
+	$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list,$config_set);
+	$cstatus=get_instance_status($rl,$inst,$base_port[$inst]);
 
+	if($cstatus!='disabled') die(sprintf("The instance named '%s' must be disabled before it can be deleted!\n",$inst));
+	printf("Removing Instance: %s",$inst);
+
+	for($i=0;$i<count($rl);$i++) {
+		if(substr($rl[$i],0,strlen($inst))==$inst) unset($rl[$i]);
+	}
+	sort($rl);
+	write_text_file_from_array_with_lock($runlist,$rl,LOCK_EX);
+	$cmd='rm -Rf '.BASE_DIR.$inst;
+	if($debug) printf("Running: %s\n",$cmd);
+	`$cmd`;
+
+	$rs=str_replace(" ","_",$inst); //replace spaces with _ in instance names for when we create the database and tmux windows
+	select_db_server('RegionDBServer');
+	dbquery(sprintf("drop database if exists %s%s",INSTANCE_DB_PREFIX,$rs));
+
+	print "\r\t\t\t\t\t\t[  OK  ]\n";
+}
 //****************************************************************************************************LIST INSTANCES*************
 if(isset($args['inst'])) {
 	print "Configured Instances:\n";
@@ -234,11 +265,13 @@ if(isset($args['add-region'])) {
 	$base_port=array();
 	$regions_list=array();
 	$locations=array();
+	$config_set='';
 
 	if(isset($args['instance'])) {
 		$instance=$args['instance'];
 		if(!in_array($instance,$instances)) die("You must specify a valid instance name that this region should be added to!\n");
 		$rl=read_text_file_to_array_with_lock($runlist,LOCK_EX);
+		$info=enum_instance($instance,$used_ports,$used_uuids,$base_port,$regions_list,$config_set);
 		$cstatus=get_instance_status($rl,$instance,$base_port[$instance]);
 		if($cstatus!='stopped') die("This instance must be stopped before you can add a region!\n");
 	} else die("You must specify an instance name using --instance that this region should be added to!\n");
@@ -1011,6 +1044,12 @@ spaces.
      [--config-set ConfigSetName] Specifies which set of *base* configs we will
            use for this instance. These can be grid or standalone config sets
            and the sources for those configs are defined in config.inc.php.
+
+--del-instance InstanceName
+           Deletes an Instance by removing all of its configs and it's
+           associated database. All regions on that instance will be destroyed!
+           An instance can only be deleted if it is first stopped and also set
+           to disabled.
 
 --start [InstanceName[,InstanceName]...] [--manual]
            Attempt to start all or just the named instances. If an instance for
