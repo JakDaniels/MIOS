@@ -80,6 +80,8 @@ while(1) {
 		}
 		$status=tmux_window_state($tsn,$rs);
 
+		//if($debug) date_log(sprintf("Instance: %s status: %s action: %s\n",$inst,$status,$action));
+
 		//attempt to restart an instance that's stopped, but only a limited number of times if the last start time was within MAX_RESTART_TIME_INTERVAL secs
 		if($action=='started' and $status=='stopped') {
 			if($last_started[$inst]+MAX_RESTART_TIME_INTERVAL>time() and $started_count[$inst]>MAX_RESTART_COUNT) {

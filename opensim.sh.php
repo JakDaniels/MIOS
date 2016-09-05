@@ -330,7 +330,7 @@ if(isset($args['rename-region'])) {
 
 
 //*********************************************************************************************START RESTART STOP STATUS VIEW VISITORS****
-$start=0; $restart=0; $stop=0; $status=0; $view=0; $config=0; $visitors=0; $manual=0;
+$start=0; $restart=0; $stop=0; $status=0; $view=0; $config=0; $visitors=0; $manual=0; $disable=0; $enable=0;
 if(isset($args['start'])) {
 	if($args['start']==1) $start=$instances; else $start=explode(',',str_replace('"','',trim($args['start'])));
 	if(isset($args['manual'])) $manual=1;
@@ -356,7 +356,12 @@ if(isset($args['view'])) {
 if(isset($args['visitors'])) {
 	if($args['visitors']==1) $visitors=$instances; else $visitors=explode(',',str_replace('"','',trim($args['visitors'])));
 }
-
+if(isset($args['disable'])) {
+	if($args['disable']==1) $disable=$instances; else $disable=explode(',',str_replace('"','',trim($args['disable'])));
+}
+if(isset($args['enable'])) {
+	if($args['enable']==1) $enable=$instances; else $enable=explode(',',str_replace('"','',trim($args['enable'])));
+}
 
 select_db_server('EstateDBServer');
 dbquery("create database if not exists ".ESTATE_DB." default character set utf8 collate utf8_unicode_ci");
@@ -436,8 +441,31 @@ if($stop) {
 				write_text_file_from_array_with_lock($runlist,$rl,LOCK_EX);
 			}
 			if($cstatus=='start') {
-				print "\r\t\t\t\t\t\t[FAILED] Instance is still starting!\n";
+				if(isset($args['r']) or isset($args['reset'])) {
+					$cstatus='stopped';
+					$rl[$i]=sprintf("%s\t%s\t%s\t%s",$inst,$rs,$base_port[$inst],'stopped');
+					sort($rl);
+					write_text_file_from_array_with_lock($runlist,$rl,LOCK_EX);
+					print "\r\t\t\t\t\t\t[OK] Instance was reset to stopped state!\n";
+					break;
+				} else {
+					print "\r\t\t\t\t\t\t[FAILED] Instance is still starting!\n";
+					break;
+				}
+			}
+			if($cstatus=='disabled') {
+				print "\r\t\t\t\t\t\t[FAILED] Instance is disabled! Use --enable to re-enable this instance.\n";
 				break;
+			}
+			if($cstatus=='stop') {
+				if(isset($args['r']) or isset($args['reset'])) {
+					$cstatus='stopped';
+					$rl[$i]=sprintf("%s\t%s\t%s\t%s",$inst,$rs,$base_port[$inst],'stopped');
+					sort($rl);
+					write_text_file_from_array_with_lock($runlist,$rl,LOCK_EX);
+					print "\r\t\t\t\t\t\t[OK] Instance was reset to stopped state!\n";
+					break;
+				}
 			}
 			sleep(2);
 			$timer+=2;
@@ -449,23 +477,6 @@ if($stop) {
 		}
 	}
 
-	//now check and see if all are stopped, if so we can kill the os_runner daemon
-	$rl=read_text_file_to_array_with_lock($runlist,LOCK_EX);
-	$stopped=0;
-	for($i=0;$i<count($rl);$i++) {
-		if(substr($rl[$i],-7)=='stopped') $stopped++;
-	}
-	//print $stopped." ".count($rl);
-	if($stopped==count($rl)) { //all stopped
-		if($debug) print "All Stopped! Terminating os_runner.\n";
-		if(file_exists($pidfile)) {
-			$pid=trim(file_get_contents($pidfile));
-			$cmd='kill -s 2 '.$pid;
-			if($debug) print "Running $cmd\n";
-			`$cmd`;
-			@unlink($pidfile);
-		}
-	}
 	if($restart) $start=$stopped_instances; //only restart stopped instances
 }
 //****************************************************************************************************START INSTANCE(S)*************
@@ -651,6 +662,10 @@ if($start) {
 							break;
 						}
 					}
+					if($cstatus=='disabled') {
+						print "\r\t\t\t\t\t\t[FAILED] Instance is disabled! Use --enable to re-enable this instance.\n";
+						break;
+					}
 					if($cstatus=='started') {
 						print "\r\t\t\t\t\t\t[  OK  ]\n";
 						break;
@@ -765,6 +780,7 @@ if($view) {
 if(is_array($visitors)) {
 	foreach($visitors as $vi) if(!in_array($vi,$instances)) die(sprintf("An instance named '%s' was not found! Use --inst to show possible instance names.\n",$vi));
 	$instances=$visitors;
+
 	foreach($instances as $inst) {
 		$logpath=sprintf(LOGS_DIR,$inst).'OpenSim.log';
 		if($debug) printf("Checking log: %s\n",$logpath);
@@ -801,9 +817,109 @@ if(is_array($visitors)) {
 				printf("%s\t%s\t%s\t%s\t%s\t%s\n",$k,$v['Region'],$v['AvatarFirst'],$v['AvatarLast'],$v['UUID'],$v['Rule']);
 			}
 		}
+	}
+}
+//****************************************************************************************************DISABLE INSTANCE(S)****
+if(is_array($disable)) {
+	foreach($disable as $di) if(!in_array($di,$instances)) die(sprintf("An instance named '%s' was not found! Use --inst to show possible instance names.\n",$di));
+	$instances=$disable;
+	$used_ports=array();
+	$used_uuids=array();
+	$base_port=array();
+	$regions_list=array();
+	$config_set='';
+	foreach($instances as $inst) {
+		$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list,$config_set);
+	}
+	foreach($instances as $inst) {
+		$rs=str_replace(" ","_",$inst); //replace spaces with _ in instance names for when we create the database and tmux windows
+		printf("Disabling Instance: %s",$inst);
+		$entry=sprintf("%s\t%s\t%s\t",$inst,$rs,$base_port[$inst]);
+		$cstatus='stopped'; //default if no entry found
+
+		$rl=read_text_file_to_array_with_lock($runlist,LOCK_EX);
+		for($i=0;$i<count($rl);$i++) {
+			if(substr($rl[$i],0,strlen($entry))==$entry) {
+				$cstatus=trim(substr($rl[$i],strlen($entry)));
+				if($cstatus=='') $cstatus='stopped';
+				break;
+			}
+		}
+		if($cstatus=='broken') {
+			if(isset($args['f']) or isset($args['fixed'])) $cstatus='stopped';
+			else {
+				print "\r\t\t\t\t\t\t[FAILED] Instance appears to be broken! Use -f to force it to disabled.\n";
+			}
+		}
+		if($cstatus=='disabled') {
+			print "\r\t\t\t\t\t\t[FAILED] Instance is already disabled! Use --enable to re-enable this instance.\n";
+		}
+		if($cstatus=='started') {
+			print "\r\t\t\t\t\t\t[FAILED] Instance cannot be disabled while it is running! please --stop the instance first.\n";
+		}
+		if($cstatus=='stopped') {
+			$rl[$i]=sprintf("%s\t%s\t%s\t%s",$inst,$rs,$base_port[$inst],'disabled');
+			sort($rl);
+			write_text_file_from_array_with_lock($runlist,$rl,LOCK_EX);
+			print "\r\t\t\t\t\t\t[  OK  ]\n";
+		}
+	}
+}
+//****************************************************************************************************ENABLE INSTANCE(S)****
+if(is_array($enable)) {
+	foreach($enable as $en) if(!in_array($en,$instances)) die(sprintf("An instance named '%s' was not found! Use --inst to show possible instance names.\n",$di));
+	$instances=$enable;
+	$used_ports=array();
+	$used_uuids=array();
+	$base_port=array();
+	$regions_list=array();
+	$config_set='';
+	foreach($instances as $inst) {
+		$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list,$config_set);
+	}
+	foreach($instances as $inst) {
+		$rs=str_replace(" ","_",$inst); //replace spaces with _ in instance names for when we create the database and tmux windows
+		printf("Enabling Instance: %s",$inst);
+		$entry=sprintf("%s\t%s\t%s\t",$inst,$rs,$base_port[$inst]);
+		$cstatus='stopped'; //default if no entry found
+
+		$rl=read_text_file_to_array_with_lock($runlist,LOCK_EX);
+		for($i=0;$i<count($rl);$i++) {
+			if(substr($rl[$i],0,strlen($entry))==$entry) {
+				$cstatus=trim(substr($rl[$i],strlen($entry)));
+				if($cstatus=='') $cstatus='stopped';
+				break;
+			}
+		}
+		if($cstatus=='disabled') {
+			$rl[$i]=sprintf("%s\t%s\t%s\t%s",$inst,$rs,$base_port[$inst],'stopped');
+			sort($rl);
+			write_text_file_from_array_with_lock($runlist,$rl,LOCK_EX);
+			print "\r\t\t\t\t\t\t[  OK  ]\n";
+		}	else {
+			print "\r\t\t\t\t\t\t[FAILED] Instance is already enabled!\n";
+		}
+	}
+}
 
 
 
+
+//****************************************************************************************************CLEAN UP****
+//check and see if all instancesare stopped, if so we can kill the os_runner daemon
+$rl=read_text_file_to_array_with_lock($runlist,LOCK_EX);
+$stopped=0;
+for($i=0;$i<count($rl);$i++) {
+	if(substr($rl[$i],-7)=='stopped' or substr($rl[$i],-8)=='disabled') $stopped++;
+}
+if($stopped==count($rl)) { //all stopped
+	if($debug) print "All Stopped! Terminating os_runner.\n";
+	if(file_exists($pidfile)) {
+		$pid=trim(file_get_contents($pidfile));
+		$cmd='kill -s 2 '.$pid;
+		if($debug) print "Running $cmd\n";
+		`$cmd`;
+		@unlink($pidfile);
 	}
 }
 //****************************************************************************************************USAGE****
@@ -929,6 +1045,16 @@ spaces.
            instance must have been previously started for the config to exist.
   [--section Name[,Name]...] View only a particular section or sections of the
                              configuration.
+
+--disable [InstanceName[,InstanceName]...]
+           Attempt to disable all or just the named instances. An instance
+           must be stopped before you can disable it, otherwise the operation
+           will show as [FAILED].
+
+--enable [InstanceName[,InstanceName]...]
+           Attempt to enable all or just the named instances. An instance
+           must be disabled before you can enable it, otherwise the operation
+           will show as [FAILED].
 
 If an instance crashes while running, it will be attempted to be restarted.
 If it starts and then dies within MAX_RESTART_TIME_INTERVAL seconds then after
