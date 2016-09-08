@@ -204,6 +204,13 @@ if(isset($args['del-instance'])) {
 	select_db_server('RegionDBServer');
 	dbquery(sprintf("drop database if exists %s%s",INSTANCE_DB_PREFIX,$rs));
 
+	//so the instance configs have changed. Signal to os_runner.sh.php if running to reload the .runlist
+	// make sure that the os_runner daemon is running
+	if(file_exists($pidfile)) {
+		$pid=trim(file_get_contents($pidfile));
+		if(file_exists("/proc/${pid}")) posix_kill($pid, SIGHUP);
+	}
+
 	print "\r\t\t\t\t\t\t[  OK  ]\n";
 }
 //****************************************************************************************************LIST INSTANCES*************
@@ -325,6 +332,15 @@ if(isset($args['add-region'])) {
 	if(!write_ini($rconfig,$rini)) die("ERROR: Could not write ini file $rconfig !\n");
 	if($debug) printf("* Updated Region config %s.\n",$rconfig);
 	printf("Region %s was created in Instance %s with UUID %s on port %d.\n",$region,$instance,$uuid,$port);
+
+
+	//so the instance configs have changed. Signal to os_runner.sh.php if running to reload the .runlist
+	// make sure that the os_runner daemon is running
+	if(file_exists($pidfile)) {
+		$pid=trim(file_get_contents($pidfile));
+		if(file_exists("/proc/${pid}")) posix_kill($pid, SIGHUP);
+	}
+
 
 }
 //****************************************************************************************************RENAME REGION***********
