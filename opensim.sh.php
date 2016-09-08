@@ -645,9 +645,14 @@ if($start) {
 			$errors++;
 		}
 
-		// Make sure we have a database to work in!
-		if($debug) printf("- Creating (if not exists) a region database: %s%s\n",INSTANCE_DB_PREFIX,$rs);
-		dbquery(sprintf("create database if not exists %s%s default character set utf8 collate utf8_unicode_ci",INSTANCE_DB_PREFIX,$rs));
+		$dbs=dbsql2array3("show databases");
+		if(!is_array($dbs) or !in_array(INSTANCE_DB_PREFIX.$rs,$dbs)) {
+			// Make sure we have a database to work in!
+			if($debug) printf("- Creating (if not exists) a region database: %s%s\n",INSTANCE_DB_PREFIX,$rs);
+			dbquery(sprintf("create database if not exists %s%s default character set utf8 collate utf8_unicode_ci",INSTANCE_DB_PREFIX,$rs));
+			$manual=1; //first run do manually as we will need to add the instances region(s) to an estate
+		}
+
 
 		// Make sure some files and paths are present!
 		if(!file_exists($ini['Startup']['shutdown_console_commands_file'])) write_text_file($ini['Startup']['shutdown_console_commands_file'],"; Lines that start with ; are comments.");
