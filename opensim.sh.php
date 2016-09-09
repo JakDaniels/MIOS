@@ -206,10 +206,10 @@ if(isset($args['del-instance'])) {
 
 	//so the instance configs have changed. Signal to os_runner.sh.php if running to reload the .runlist
 	// make sure that the os_runner daemon is running
-	if(file_exists($pidfile)) {
-		$pid=trim(file_get_contents($pidfile));
-		if(file_exists("/proc/${pid}")) posix_kill($pid, SIGHUP);
-	}
+	//if(file_exists($pidfile)) {
+	//	$pid=trim(file_get_contents($pidfile));
+	//	if(file_exists("/proc/${pid}")) posix_kill($pid, SIGHUP);
+	//}
 
 	print "\r\t\t\t\t\t\t[  OK  ]\n";
 }
@@ -336,10 +336,10 @@ if(isset($args['add-region'])) {
 
 	//so the instance configs have changed. Signal to os_runner.sh.php if running to reload the .runlist
 	// make sure that the os_runner daemon is running
-	if(file_exists($pidfile)) {
-		$pid=trim(file_get_contents($pidfile));
-		if(file_exists("/proc/${pid}")) posix_kill($pid, SIGHUP);
-	}
+	//if(file_exists($pidfile)) {
+	//	$pid=trim(file_get_contents($pidfile));
+	//	if(file_exists("/proc/${pid}")) posix_kill($pid, SIGHUP);
+	//}
 
 
 }
@@ -448,6 +448,7 @@ if($stop) {
 	if(file_exists($pidfile)) {
 		$pid=trim(file_get_contents($pidfile));
 		if(!file_exists("/proc/${pid}")) @unlink($pidfile);
+		else posix_kill($pid, SIGHUP); //trigger .runlist reload
 	}
 	if(!file_exists($pidfile)) {
 		@mkdir(OS_RUNNER_LOG_DIR);
@@ -548,6 +549,7 @@ if($start) {
 	if(file_exists($pidfile)) {
 		$pid=trim(file_get_contents($pidfile));
 		if(!file_exists("/proc/${pid}")) @unlink($pidfile);
+		else posix_kill($pid, SIGHUP); //trigger .runlist reload
 	}
 	if(!file_exists($pidfile)) {
 		@mkdir(OS_RUNNER_LOG_DIR);
