@@ -507,7 +507,7 @@ if($stop) {
 				print "\r\t\t\t\t\t\t[FAILED] Instance is disabled! Use --enable to re-enable this instance.\n";
 				break;
 			}
-			if($cstatus=='stop') {
+			if($cstatus=='stop' or $cstatus=='broken') {
 				if(isset($args['r']) or isset($args['reset'])) {
 					$cstatus='stopped';
 					$rl[$i]=sprintf("%s\t%s\t%s\t%s",$inst,$rs,$base_port[$inst],'stopped');
