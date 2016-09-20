@@ -1,21 +1,7 @@
 #!/usr/bin/php -q
 <?php
 error_reporting (E_ALL);
-define('HOME_DIR',trim(`echo ~`));
-define('BASE_DIR',HOME_DIR.'/MIOS/Instances/');
-define('BASE_CONFIGS',BASE_DIR.'.config/');
-define('CONFIG_SETS',BASE_DIR.'.config/ConfigSets/');
-define('CONFIGS_DIR',BASE_DIR.'%s/Configs/');
-define('LOGS_DIR',BASE_DIR.'%s/Logs/');
-define('SCRIPTS_DIR',BASE_DIR.'%s/ScriptEngines/');
-define('OUT_CONF_DIR',BASE_DIR.'%s/ConfigOut/');
-define('OS_ROOT_DIR',HOME_DIR.'/opensim/');
-define('BIN_DIR',HOME_DIR.'/opensim/bin/');
-define('INC_DIR',HOME_DIR.'/MIOS/php_inc/');
-define('OS_RUNNER',INC_DIR.'os_runner.sh.php');
-define('OS_RUNNER_LOG_DIR',HOME_DIR.'/MIOS/Logs/');
-define('OS_RUNNER_LOG',OS_RUNNER_LOG_DIR.'os_runner.log');
-define('OS_EXEC',INC_DIR.'os_exec.sh');
+include('php_inc/os_defines.inc.php');
 
 if(file_exists(BASE_CONFIGS.'config.inc.php')) include(BASE_CONFIGS.'config.inc.php');
 else die("You must create a config file '".BASE_CONFIGS."config.inc.php' before you can use this script!\nPlease use '".BASE_CONFIGS."config.inc.php.example' as a template .\n");
@@ -24,13 +10,6 @@ include('php_inc/functions.inc.php');
 include('php_inc/os_functions.inc.php');
 
 ob_implicit_flush ();
-define("DEBUG",0);
-//script specific debug defines
-define('SHOWINFO',1);
-define('SHOWCMDS',2);
-define('SHOWCMDERRORS',4);
-define('LOGCMDERRORS',8);
-
 set_time_limit (0);
 
 // signal handling
@@ -957,12 +936,62 @@ if(is_array($enable)) {
 		}
 	}
 }
+//****************************************************************************************************STATS****
+if(isset($args['get-stats'])) {
+
+	if($args['get-stats']==1) $inst=$instances; else $inst=explode(',',str_replace('"','',trim($args['get-stats'])));
+
+	foreach($inst as $i) if(!in_array($i,$instances)) die(sprintf("An instance named '%s' was not found! Use --inst to show possible instance names.\n",$i));
+
+	$used_ports=array();
+	$used_uuids=array();
+	$base_port=array();
+	$regions_list=array();
+	$config_set='';
+	foreach($instances as $inst) {
+		$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list,$config_set);
+	}
+
+	$rl=read_text_file_to_array_with_lock($runlist,LOCK_EX);
+	$interfaces=get_interfaces();
+	$myip=$interfaces['eth0']['ipv4'];
+
+	foreach($instances as $inst) {
+		$rs=str_replace(" ","_",$inst); //replace spaces with _ in instance names for when we create the database and tmux windows
+		$entry=sprintf("%s\t%s\t%s\t",$inst,$rs,$base_port[$inst]);
+		$cstatus='stopped';
+		for($i=0;$i<count($rl);$i++) {
+			if(substr($rl[$i],0,strlen($entry))==$entry) {
+				$cstatus=trim(substr($rl[$i],strlen($entry)));
+				if($cstatus=='') $cstatus='stopped';
+				break;
+			}
+		}
+
+		if($cstatus=='started') {
+			$c_inipath=sprintf(OUT_CONF_DIR,$inst).'combined.ini';
+			$ini=parse_ini($c_inipath, true, INI_SCANNER_RAW) or array();
+			if(isset($ini['Startup']['ManagedStatsRemoteFetchURI'])) {
+				$url=sprintf('http://%s:%s/%s/',$myip,$base_port[$inst],$ini['Startup']['ManagedStatsRemoteFetchURI']);
+				$json_stats=get_data_from_url($url);
+				if(isset($args['show'])) {
+					printf("Statistics for Instance: '%s'\n",$inst);
+					//print_r(json_decode($json_stats,true));
+					print array_to_proc(json_decode($json_stats,true));
+				} else {
 
 
 
 
+
+
+				}
+			} else if($debug) printf("Instance '%s' is not configured to provide stats! Please set ManagedStatsRemoteFetchURI in [Startup] section of .ini\n",$inst);
+		} else if($debug) printf("Instance '%s' must be started in order to provide stats!\n",$inst);
+	}
+}
 //****************************************************************************************************CLEAN UP****
-//check and see if all instancesare stopped, if so we can kill the os_runner daemon
+//check and see if all instances are stopped, if so we can kill the os_runner daemon
 $rl=read_text_file_to_array_with_lock($runlist,LOCK_EX);
 $stopped=0;
 for($i=0;$i<count($rl);$i++) {

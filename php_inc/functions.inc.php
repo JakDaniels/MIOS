@@ -189,6 +189,18 @@ function array_to_xml($array) {
 	return $xml;
 }
 
+
+function array_to_proc($a,$proc='') {
+	$out='';
+	if(gettype($a)=="array") {
+		foreach($a as $k=>$v) {
+			$pre="${proc}/".str_replace('/','\/',$k);
+			$out.=array_to_proc($v,$pre);
+		}
+	} else $out.="${proc}/".str_replace('/','\/',$a)."\n";
+	return $out;
+}
+
 /**
 * takes a string including html unicode entities and converts it to a unicode binary encoded string
 */
@@ -441,6 +453,44 @@ function read_text_file_to_array_with_lock($filepath,$lock=LOCK_EX) {
 
 function date_log($text) {
 	print date('Y-m-d H:i:s')." ".$text;
+}
+
+function get_interfaces() {
+	$o=explode("\n",`ip addr show`);
+	$k=0; $in=array();
+	foreach($o as $l) {
+		if(preg_match("/^[0-9]+\:\ ([a-z0-9]+)\:/i",$l,$m)) {
+			$k=$m[1];
+			continue;
+		}
+		if($k) {
+			if(preg_match("/link\/([a-z]+)\ ([0-9a-f:]+)\ brd/i",$l,$m)) {
+				$in[$k]['type']=$m[1];
+				$in[$k]['mac']=$m[2];
+				continue;
+			}
+			if(preg_match("/inet\ ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\//i",$l,$m)) {
+				$in[$k]['ipv4']=$m[1];
+				continue;
+			}
+			if(preg_match("/inet6\ ([0-9a-f:]+)\//i",$l,$m)) {
+				$in[$k]['ipv6']=$m[1];
+				continue;
+			}
+		}
+	}
+	return $in;
+}
+
+function get_data_from_url($url) {
+	$ch = curl_init();
+	$timeout = 5;
+	curl_setopt($ch, CURLOPT_URL, $url);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+	$data = curl_exec($ch);
+	curl_close($ch);
+	return $data;
 }
 
 ?>

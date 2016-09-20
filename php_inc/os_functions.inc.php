@@ -176,7 +176,7 @@ function enum_instance($inst,&$used_ports,&$used_uuids,&$base_port,&$regions_lis
 		foreach($dini['Region Defaults'] as $k=>$v) {
 			if(!isset($rini[$region][$k])) {
 				$rini[$region][$k]=$v;
-				if($debug) printf("- Added '%s = %s' to %s for region %s\n",$k,$v,$oconfig,$region);
+				if($debug>1) printf("- Added '%s = %s' to %s for region %s\n",$k,$v,$oconfig,$region);
 			}
 			if(!isset($rini[$region]['SizeX'])) $rini[$region]['SizeX']=256;
 			if(!isset($rini[$region]['SizeY'])) $rini[$region]['SizeY']=256;
@@ -187,7 +187,7 @@ function enum_instance($inst,&$used_ports,&$used_uuids,&$base_port,&$regions_lis
 			foreach($rmini[$region] as $k=>$v) {
 				if(!isset($rini[$region][$k])) {
 					$rini[$region][$k]=$v;
-					if($debug) printf("- Added '%s = %s' to %s for region %s\n",$k,$v,$oconfig,$region);
+					if($debug>1) printf("- Added '%s = %s' to %s for region %s\n",$k,$v,$oconfig,$region);
 				}
 			}
 		}
