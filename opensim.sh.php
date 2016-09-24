@@ -344,16 +344,16 @@ if(isset($args['rename-region'])) {
 	if(!$found)	die("That region UUID could not be found in any instance!\n");
 	$rl=read_text_file_to_array_with_lock($runlist,LOCK_EX);
 	$cstatus=get_instance_status($rl,$inst,$base_port[$inst]);
-	if($cstatus!='stopped' and $cstatus!='broken') die("This instance must be stopped before you can rename a region!\n");
+	if($cstatus!='stopped' and $cstatus!='disabled' and $cstatus!='broken') die("This instance must be stopped or disabled before you can rename a region!\n");
 	if($found['RegionName']==$rregion) die("The new region name is the same as the old one!\n");
 	$rconfig=sprintf(CONFIGS_DIR,$inst).'Regions/Regions.ini';
 	if($debug) printf("- Reading config file: %s\n",$rconfig);
 	$rini=parse_ini($rconfig, true, INI_SCANNER_RAW) or array();
 	$rini[$rregion]=$rini[$found['RegionName']];
 	unset($rini[$found['RegionName']]);
-	print_r($rini);
+	//print_r($rini);
 	if(!write_ini($rconfig,$rini)) die("ERROR: Could not write ini file $rconfig !\n");
-	if($debug) printf("* Updated Region config %s.\n",$rconfig);
+	printf("* Updated Region config %s.\n",$rconfig);
 }
 
 
@@ -952,6 +952,11 @@ if(isset($args['get-stats'])) {
 		$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list,$config_set);
 	}
 
+	print_r($used_ports);
+	print_r($used_uuids);
+	print_r($base_port);
+	print_r($regions_list);
+
 	$rl=read_text_file_to_array_with_lock($runlist,LOCK_EX);
 	$interfaces=get_interfaces();
 	$myip=$interfaces['eth0']['ipv4'];
@@ -975,7 +980,7 @@ if(isset($args['get-stats'])) {
 				$url=sprintf('http://%s:%s/%s/',$myip,$base_port[$inst],$ini['Startup']['ManagedStatsRemoteFetchURI']);
 				$json_stats=get_data_from_url($url);
 				if(isset($args['show'])) {
-					printf("Statistics for Instance: '%s'\n",$inst);
+					printf("Statistics for Instance: '%s' on url '%s'\n",$inst,$url);
 					//print_r(json_decode($json_stats,true));
 					print array_to_proc(json_decode($json_stats,true));
 				} else {
