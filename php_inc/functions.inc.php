@@ -197,7 +197,7 @@ function array_to_proc($a,$proc='') {
 			$pre="${proc}/".str_replace('/','\/',$k);
 			$out.=array_to_proc($v,$pre);
 		}
-	} else $out.="${proc}/".str_replace('/','\/',$a)."\n";
+	} else $out.="${proc} := ".str_replace('/','\/',$a)."\n";
 	return $out;
 }
 
