@@ -60,7 +60,8 @@ In general, on a new system where you want to run MIOS and OpenSim do the follow
 	# passwd opensim
 
 Make sure you set a password for that account, by default on Centos 6 you will be able to login to that
-account via SSH (your firewall rules permitting of course :). Of course having SSH access to your OpenSim consoles will be very useful later...
+account via SSH (your firewall rules permitting of course :). Of course having SSH access to your OpenSim consoles
+will be very useful later...
 
 2) become that user and install MIOS from github:
 
@@ -71,19 +72,23 @@ account via SSH (your firewall rules permitting of course :). Of course having S
 3) Copy the example config and edit to fill in some values:
 
 	# cp Instances/.config/config.inc.php.example Instances/.config/config.inc.php
-	# nano Instances/.config/config.inc.php
+	# vi Instances/.config/config.inc.php
 
-You definitely need to set the passwords that will be used for database access, both by MIOS and 
-OpenSim. Don't worry about setting up any actual databases or users in Mysql now, MIOS can do that for you
-later, but it will need Mysql root privileges to do this!
+You definitely need to change the passwords that will be used for database access, from 'xxxxx' to something else.
+The Mysql user accounts and passwords in the config are used by both MIOS and OpenSim when creating and running OpenSim Instances..
+Don't worry about setting up any actual users or databases in Mysql now, MIOS can do that for you!
 
-4) Use MIOS to setup the database server and the user accounts it needs:
+You will need the Mysql root password to do this next bit. We create the accounts in Mysql that MIOS and OpenSim will use:
+
+4) Using MIOS to setup the database server and the user accounts it needs:
 
 	# ./opensim.sh.php --init-mysql
 	We are about to add two users to mysql, one for administering databases, and one that opensim will use for
 	database access.
 	You will need to provide the mysql root password to do this.
 	Enter password:
+
+You could do this bit manually of course, creating two accounts in Mysql with the credentails from the MIOS config... but it's quicker this way :)
 
 5) Use MIOS to download and build the latest OpenSim from git:
 
