@@ -37,7 +37,7 @@ In general, on a new system where you want to run MIOS and opensim do the follow
 	# nano Instances/.config/config.inc.php
 
 You definitely need to set the passwords that will be used for database access, both by MIOS and 
-Opensim. Don't worry about setting up any actual databases or users in Mysql now, MIOS can do that for you
+OpenSim. Don't worry about setting up any actual databases or users in Mysql now, MIOS can do that for you
 later, but it will need Mysql root privileges to do this!
 
 4) Use MIOS to setup the database server and the user accounts it needs:
@@ -48,15 +48,16 @@ later, but it will need Mysql root privileges to do this!
 	You will need to provide the mysql root password to do this.
 	Enter password:
 
-5) Use MIOS to download and build the latest Opensim from git:
+5) Use MIOS to download and build the latest OpenSim from git:
 
 	# ./opensim.sh.php --os-update
 
 MIOS will grab the opensim build tree from git and place it at ~/opensim. It will also build it in release mode.
 
 6) Use MIOS to grab a basic default working set of opensim configuration files. MIOS uses the default files that
-   come with Opensim as a starting point for standalone instances, or files provided by a grid operator like OSGrid. (It
-   downloads them). You can later customise the configuration by having you own set of small .ini files that override the defaults.
+   come with OpenSim as a starting point for standalone instances, or files provided by a grid operator like OSGrid. (It
+   downloads them). You can later customise the configuration by having you own set of small .ini files that override the
+   defaults in a predictable way.
    
 	# ./opensim.sh.php --os-config
 	Starting retrieval of config set 'standalone'...
@@ -102,7 +103,7 @@ MIOS will grab the opensim build tree from git and place it at ~/opensim. It wil
 
 	2016-10-02 20:49:01 (2.04 MB/s) - “/home/opensim/MIOS/Instances/.config/ConfigSets/osgrid/config-include/FlotsamCache.ini” saved [1865/1865]
 
-7) Create your first Opensim Instance! By default if --config-set is not given then it will use the downloaded 'osgrid' config files. This
+7) Create your first OpenSim Instance! By default if --config-set is not given then it will use the downloaded 'osgrid' config files. This
    can be changed in MIOS's config file.
 
 	# ./opensim.sh.php --add-instance Test1 --config-set osgrid
@@ -112,6 +113,9 @@ MIOS will grab the opensim build tree from git and place it at ~/opensim. It wil
 
 	# ./opensim.sh.php --add-region TestRegion1 --instance Test1 --location 10000,10000 --size 512
 	Region TestRegion1 was created in Instance Test1 with UUID 8172c646-c147-efec-8476-d5e5b71ec62d on port 9005.
+	
+MIOS will not detect if the grid location is already occupied on the grid, so take care to find some coordinates that are
+not already in use before doing this. It will however detect if another instance has used these coordinated for any of it's regions.
 
 9) The first time a new region starts it will ask you questions about which estate it should be part of, so for the first
    time we fire up the instance manually and answer the questions:
