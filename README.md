@@ -59,11 +59,11 @@ In general, on a new system where you want to run MIOS and OpenSim do the follow
 	# adduser opensim
 	# passwd opensim
 
-Make sure you set a password for that account, by default on Centos 6 you will be able to login to that
+Make sure you set a password for that account. By default on Centos 6 you will be able to login to that
 account via SSH (your firewall rules permitting of course :). Of course having SSH access to your OpenSim consoles
 will be very useful later...
 
-### 2) become that user and install MIOS from github:
+### 2) As that user, install MIOS from github:
 
 	# su - opensim
 	# git clone https://github.com/JakDaniels/MIOS.git
