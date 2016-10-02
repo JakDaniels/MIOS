@@ -50,13 +50,17 @@ Make sure the database server is running :)
 
 	# service mysqld start
 
-# Install and configure MIOS.
+# Install and configure MIOS
 
 In general, on a new system where you want to run MIOS and OpenSim do the following:
 
 1) As root, create a user that will run the OpenSim instances:
 
 	# adduser opensim
+	# passwd opensim
+
+Make sure you set a password for that account, by default on Centos 6 you will be able to login to that
+account via SSH (your firewall rules permitting of course :). Of course having SSH access to your OpenSim consoles will be very useful later...
 
 2) become that user and install MIOS from github:
 
