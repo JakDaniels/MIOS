@@ -10,6 +10,45 @@ of Open Simulator and add new regions to those Instances.
 It also monitors the Instances and respawns them if necessary after a crash, or marks them as broken
 if the respawn happens too often and too many times.
 
+On Centos 6 you will need the make sure the following Repos are enabled:
+
+EPEL
+
+	# yum install epel-release
+
+and optionally for a newer version of the Mono packages for Centos 6:
+
+	# yum install http://el6.ateb.co.uk/ateb/x86_64/RPMS/ateb-release-6-1.noarch.rpm
+
+Look at the documentation at http://el6.ateb.co.uk/ for info on how to choose different Mono versions that work with OpenSim.
+*Disclaimer:* these Mono RPMS are provided by me, I use them myself with MIOS. You don't have to use them. Centos 6 packages
+Mono 2.10.8 in it's main Repo. This *should* work with OpenSim although I have not tested this old version :) 
+
+Make sure these packages are installed:
+
+	# yum install php php-mysql php-cli php-common php-pdo php-process php-pecl-rrd git tmux wget mono-complete mysql-server
+ 
+NOTE: Make sure you've run the mysql_secure_installation script that comes with Mysql and have set a root password. You will
+need this Mysql root password later when you set up MIOS! You also need to remember to tweak the Mysql config in /etc/my.cnf, adding the
+max_allowed_packet=128M setting that is needed by Opensim. My file looks like this:
+
+	[mysqld]
+	datadir=/var/lib/mysql
+	socket=/var/lib/mysql/mysql.sock
+	user=mysql
+	# Disabling symbolic-links is recommended to prevent assorted security risks
+	symbolic-links=0
+	max_allowed_packet=128M
+
+	[mysqld_safe]
+	log-error=/var/log/mysqld.log
+	pid-file=/var/run/mysqld/mysqld.pid
+
+Make sure the database server is running :)
+
+	# service mysqld start
+
+Now we need to configure MIOS.
 It does need some initial simple configuration:
 
 Copy the file ~/MIOS/Instances/.config/config.inc.php.example to ~/MIOS/Instances/.config/config.inc.php
@@ -115,7 +154,7 @@ MIOS uses, OSGrid tracks any config changes that might occur as a result of code
 Sometimes the default configs supplied with OpenSim change too. New options are sometimes added. We need to make sure we use the latest configs after a code update.
 
 7) Create your first OpenSim Instance! By default if --config-set is not given then it will use the downloaded 'osgrid' config files. This
-   can be changed in MIOS's config file.
+   can be changed in the MIOS config file.
 
 	# ./opensim.sh.php --add-instance Test1 --config-set osgrid
 	The Instance configs were generated successfully! Use --add-region now to add regions to this instance.
