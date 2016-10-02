@@ -3,7 +3,7 @@ MIOS is a set of control scripts that let you easily run Multiple Instances of O
 
 **Notice:**
 
-MIOS runs on Linux only, it's been tested on Centos 6 distro and requires mysql or mariadb as the backend database for OpenSim.
+MIOS runs on Linux only, it's been tested on Centos 6 distro and requires Mysql or Mariadb as the backend database for OpenSim.
 
 This is still very much work in progress, but so far it very quickly lets you spin up Instances
 of Open Simulator and add new regions to those Instances.
@@ -16,13 +16,14 @@ EPEL
 
 	# yum install epel-release
 
-and optionally for a newer version of the Mono packages for Centos 6:
+and optionally for a newer version of the Mono packages for Centos 6, tested to work with OpenSim (currently 3.10, 3.12 and 4.4.2.11):
 
 	# yum install http://el6.ateb.co.uk/ateb/x86_64/RPMS/ateb-release-6-1.noarch.rpm
 
-Look at the documentation at http://el6.ateb.co.uk/ for info on how to choose different Mono versions that work with OpenSim.
-*Disclaimer:* these Mono RPMS are provided by me, I use them myself with MIOS. You don't have to use them. Centos 6 packages
-Mono 2.10.8 in it's main Repo. This *should* work with OpenSim although I have not tested this old version :) 
+Look at the Repo documentation at http://el6.ateb.co.uk/ for info on how to choose different Mono versions that work with OpenSim.
+*Disclaimer:* This is my own Repo and these Mono RPMS are provided by me, I use them myself with MIOS. You don't have to use them. Centos 6 packages
+Mono 2.10.8 in it's main Repo. This *should* work with OpenSim although I have not tested this old version :)
+You can also build Mono yourself from http://download.mono-project.com/sources/mono/ if you want to try other versions.
 
 Make sure these packages are installed:
 
