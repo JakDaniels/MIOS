@@ -96,7 +96,9 @@ You could do this bit manually of course, creating two accounts in MySQL with th
 
 MIOS will grab the opensim build tree from git and place it at ~/opensim. It will also build it in release mode.
 
-6) Use MIOS to grab a basic default working set of opensim configuration files. MIOS uses the default files that
+6) Use MIOS to grab a basic default working set of opensim configuration files.
+
+   MIOS uses the default files that
    come with OpenSim as a starting point for standalone instances, or files provided by a grid operator like OSGrid. (It
    downloads them). You can later customise the configuration by having you own set of small .ini files that override the
    defaults in a predictable way, by providing just the setting you want. This way you *never* need to touch the default
