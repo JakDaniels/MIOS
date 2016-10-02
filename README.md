@@ -50,18 +50,7 @@ Make sure the database server is running :)
 
 	# service mysqld start
 
-Now we need to configure MIOS.
-It does need some initial simple configuration:
-
-Copy the file ~/MIOS/Instances/.config/config.inc.php.example to ~/MIOS/Instances/.config/config.inc.php
-and edit accordingly. Most stuff should be set up already, but you will need to set the database usernames
-and passwords etc.
-
-Run
-
-	./opensim.sh.php --help
-
-for more instructions on manipulating Instances once the initial config is done.
+# Now we need to configure MIOS.
 
 In general, on a new system where you want to run MIOS and OpenSim do the following:
 
