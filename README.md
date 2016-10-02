@@ -200,9 +200,9 @@ and not under MIOS control so we can answer these interactive questions.
 	Run this command: /home/opensim/MIOS/php_inc/os_exec.sh "/home/opensim/MIOS/Instances/Test1/ConfigOut/empty.ini" "/home/opensim/MIOS/Instances/Test1/ConfigOut/combined.ini" "/home/opensim/MIOS/Instances/Test1/Logs/OpenSim.pid"
 	
    Yes, this bit is a bit clumsy.... you have to run the command that is returned above. Hopefully I'll fix this.
-   For now, run the returned command and join the region to the estate. Then shutdown the instance (type shutdown on the opensim console).
+   For now, run the returned command and join the region to the estate. Then shutdown the Instance (type shutdown on the opensim console).
    Now is a good time to find and debug any other issues the Instance may have in starting (like using an already occupied grid location)
-   before putting the instance under full MIOS control. Once the Instance and its Region(s) come up cleanly using the command  provided by the
+   before putting the Instance under full MIOS control. Once the Instance and its Region(s) come up cleanly using the command  provided by the
    --manual parameter, you can proceed to let MIOS start, stop and monitor the Instance.
    
 ### 10) List the Instances and the Regions they are running
@@ -221,5 +221,10 @@ and not under MIOS control so we can answer these interactive questions.
 	# ./opensim.sh.php --start
 	Starting Instance: Test1...               [  OK  ]
 
-That's about it for initial configuration. Have a look at ./opensim.sh.php --help for more stuff you can do,..
+That's about it for initial configuration. Try
 
+	~/opensim.sh.php --help
+
+for more stuff you can do,..
+
+Questions? Try asking jak at ateb dot co dot uk
