@@ -78,9 +78,9 @@ You definitely need to change the passwords that will be used for database acces
 The Mysql user accounts and passwords in the config are used by both MIOS and OpenSim when creating and running OpenSim Instances..
 Don't worry about setting up any actual users or databases in Mysql now, MIOS can do that for you!
 
-You will need the Mysql root password to do this next bit. We create the accounts in Mysql that MIOS and OpenSim will use:
+You will need the Mysql root password to do this next bit. We create the user accounts in Mysql that MIOS and OpenSim will use.
 
-4) Using MIOS to setup the database server and the user accounts it needs:
+4) Using MIOS to setup the database server:
 
 	# ./opensim.sh.php --init-mysql
 	We are about to add two users to mysql, one for administering databases, and one that opensim will use for
