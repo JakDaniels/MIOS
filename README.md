@@ -117,7 +117,7 @@ defaults in a predictable way. By providing just the setting you want, in your o
 Hint: look in directory MIOS/Instances/.config/Overrides and  MIOS/Instances/[Instance Name]/Configs/Overrides
 This is where your put own OpenSim .ini file settings.
 
-So... here we go.... let's setup the defaults configs for OpenSim:
+So... here we go.... let's setup the default configs for OpenSim:
    
 	# ./opensim.sh.php --os-config
 	Starting retrieval of config set 'standalone'...
@@ -164,7 +164,7 @@ So... here we go.... let's setup the defaults configs for OpenSim:
 	2016-10-02 20:49:01 (2.04 MB/s) - “/home/opensim/MIOS/Instances/.config/ConfigSets/osgrid/config-include/FlotsamCache.ini” saved [1865/1865]
 
 It is recommended that you run this after every time you do a --os-update. Features in OpenSim change quickly on the development branch
-MIOS uses, OSGrid tracks any config changes that might occur as a result of code changes and regularly produces new base configs for the grid.
+MIOS uses, OSGrid tends to track any config changes that might occur as a result of code changes (within a day or so) and regularly produces new base configs for the grid.
 Sometimes the default configs supplied with OpenSim change too. New options are sometimes added. We need to make sure we use the latest 
 default configs after a code update.
 
