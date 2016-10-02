@@ -1,7 +1,8 @@
 # MIOS
 MIOS is a set of control scripts that let you easily run Multiple Instances of Open Simulator.
 
-**Notice** 
+**Notice:**
+
 MIOS runs on Linux only, it's been tested on Centos 6 distro and requires mysql or mariadb as the backend database for OpenSim.
 
 This is still very much work in progress, but so far it very quickly lets you spin up Instances
@@ -23,7 +24,7 @@ for more instructions on manipulating Instances once the initial config is done.
 
 In general, on a new system where you want to run MIOS and OpenSim do the following:
 
-1) As root, create a user that will run the opensim instances:
+1) As root, create a user that will run the OpenSim instances:
 
 	# adduser opensim
 
@@ -59,7 +60,7 @@ MIOS will grab the opensim build tree from git and place it at ~/opensim. It wil
 6) Use MIOS to grab a basic default working set of opensim configuration files. MIOS uses the default files that
    come with OpenSim as a starting point for standalone instances, or files provided by a grid operator like OSGrid. (It
    downloads them). You can later customise the configuration by having you own set of small .ini files that override the
-   defaults in a predictable way.
+   defaults in a predictable way. This way you *never* need to touch the default .ini files or those provided by OSGrid.
    
 	# ./opensim.sh.php --os-config
 	Starting retrieval of config set 'standalone'...
