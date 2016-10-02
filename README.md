@@ -60,7 +60,10 @@ MIOS will grab the opensim build tree from git and place it at ~/opensim. It wil
 6) Use MIOS to grab a basic default working set of opensim configuration files. MIOS uses the default files that
    come with OpenSim as a starting point for standalone instances, or files provided by a grid operator like OSGrid. (It
    downloads them). You can later customise the configuration by having you own set of small .ini files that override the
-   defaults in a predictable way. This way you *never* need to touch the default .ini files or those provided by OSGrid.
+   defaults in a predictable way, by providing just the setting you want. This way you *never* need to touch the default
+   .ini files or those provided by OSGrid, and any customisations you provide using .ini overrides 
+   (look in directory MIOS/Instances/.config/Overrides and  MIOS/Instances/[Instance Name]/Configs/Overrides <- this is where your
+   customisations go...) will be overlayed on top of the defaults.
    
 	# ./opensim.sh.php --os-config
 	Starting retrieval of config set 'standalone'...
