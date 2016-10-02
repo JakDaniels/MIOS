@@ -118,16 +118,18 @@ MIOS will not detect if the grid location is already occupied on the grid, so ta
 not already in use before doing this. It will however detect if another instance has used these coordinated for any of it's regions.
 
 9) The first time a new region starts it will ask you questions about which estate it should be part of, so for the first
-   time we fire up the instance manually and answer the questions:
+   time we fire up the instance manually and not under MIOS control so we can answer the interactive questions:
    
 	# ./opensim.sh.php --start Test1 --manual
-	Run this command: /home/opensim/MIOS/php_inc/os_exec.sh "/home/opensim/MIOS/Instances/Test1/ConfigOut/empty.ini"
-	"/home/opensim/MIOS/Instances/Test1/ConfigOut/combined.ini" "/home/opensim/MIOS/Instances/Test1/Logs/OpenSim.pid"
+	Run this command: /home/opensim/MIOS/php_inc/os_exec.sh "/home/opensim/MIOS/Instances/Test1/ConfigOut/empty.ini" "/home/opensim/MIOS/Instances/Test1/ConfigOut/combined.ini" "/home/opensim/MIOS/Instances/Test1/Logs/OpenSim.pid"
 	
    Yes, this bit is a bit clumsy.... you have to run the command that is returned above. Hopefully I'll fix this.
-   Run the returned command and join the region to the estate. Then shutdown the instance (type shutdown on the opensim console)
+   Run the returned command and join the region to the estate. Then shutdown the instance (type shutdown on the opensim console).
+   Now is a good time to find and debug any other issues the instance may have in starting (like using an already occupied grid location)
+   before putting the instance under full MIOS control. Once the instance and its region(s) come up cleanly using the command  provided by the
+   --manual parameter, you can proceed to let MIOS start, stop and monitor the instance.
    
-10) You can now list the instances and regions you have created:
+10) List the instances and regions you have created:
 
 	# ./opensim.sh.php --list
 
