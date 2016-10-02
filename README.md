@@ -61,9 +61,10 @@ MIOS will grab the opensim build tree from git and place it at ~/opensim. It wil
    come with OpenSim as a starting point for standalone instances, or files provided by a grid operator like OSGrid. (It
    downloads them). You can later customise the configuration by having you own set of small .ini files that override the
    defaults in a predictable way, by providing just the setting you want. This way you *never* need to touch the default
-   .ini files or those provided by OSGrid, and any customisations you provide using .ini overrides 
-   (look in directory MIOS/Instances/.config/Overrides and  MIOS/Instances/[Instance Name]/Configs/Overrides <- this is where your
-   customisations go...) will be overlayed on top of the defaults.
+   .ini files or those provided by OSGrid, and any customisations you provide using .ini overrides will be overlayed on top of the defaults.
+   
+   Hint: look in directory MIOS/Instances/.config/Overrides and  MIOS/Instances/[Instance Name]/Configs/Overrides
+   This is where your put own OpenSim .ini file settings.
    
 	# ./opensim.sh.php --os-config
 	Starting retrieval of config set 'standalone'...
@@ -108,6 +109,10 @@ MIOS will grab the opensim build tree from git and place it at ~/opensim. It wil
 	100%[============================================================================================================>] 1,865       --.-K/s   in 0.001s
 
 	2016-10-02 20:49:01 (2.04 MB/s) - “/home/opensim/MIOS/Instances/.config/ConfigSets/osgrid/config-include/FlotsamCache.ini” saved [1865/1865]
+
+It is recommended that you run this after every time you do a --os-update. Features in OpenSim change quickly on the development branch
+MIOS uses, OSGrid tracks any config changes that might occur as a result of code changes and regularly produces new base configs for the grid.
+Sometimes the default configs supplied with OpenSim change too. New options are sometimes added. We need to make sure we use the latest configs after a code update.
 
 7) Create your first OpenSim Instance! By default if --config-set is not given then it will use the downloaded 'osgrid' config files. This
    can be changed in MIOS's config file.
