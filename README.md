@@ -3,7 +3,7 @@ MIOS is a set of control scripts that let you easily run Multiple Instances of O
 
 **Notice:**
 
-MIOS runs on Linux only, it's been tested on Centos 6 distro and requires Mysql or Mariadb as the backend database for OpenSim.
+MIOS runs on Linux only, it's been tested on Centos 6 distro and requires MySQL or Mariadb as the backend database for OpenSim.
 
 This is still very much work in progress, but so far it very quickly lets you spin up Instances
 of Open Simulator and add new regions to those Instances.
@@ -30,8 +30,8 @@ Make sure these packages are installed:
 
 	# yum install php php-mysql php-cli php-common php-pdo php-process php-pecl-rrd git tmux wget mono-complete mysql-server
  
-NOTE: Make sure you've run the mysql_secure_installation script that comes with Mysql and have set a root password. You will
-need this Mysql root password later when you set up MIOS! You also need to remember to tweak the Mysql config in /etc/my.cnf, adding the
+NOTE: Make sure you've run the mysql_secure_installation script that comes with MySQL and have set a root password. You will
+need this MySQL root password later when you set up MIOS! You also need to remember to tweak the MySQL config in /etc/my.cnf, adding the
 max_allowed_packet=128M setting that is needed by Opensim. My file looks like this:
 
 	[mysqld]
@@ -75,10 +75,10 @@ will be very useful later...
 	# vi Instances/.config/config.inc.php
 
 You definitely need to change the passwords that will be used for database access, from 'xxxxx' to something else.
-The Mysql user accounts and passwords in the config are used by both MIOS and OpenSim when creating and running OpenSim Instances..
-Don't worry about setting up any actual users or databases in Mysql now, MIOS can do that for you!
+The MySQL user accounts and passwords in the config are used by both MIOS and OpenSim when creating and running OpenSim Instances..
+Don't worry about setting up any actual users or databases in MySQL now, MIOS can do that for you!
 
-You will need the Mysql root password to do this next bit. We create the user accounts in Mysql that MIOS and OpenSim will use.
+You will need the MySQL root password to do this next bit. We create the user accounts in MySQL that MIOS and OpenSim will use.
 
 4) Using MIOS to setup the database server:
 
@@ -88,7 +88,7 @@ You will need the Mysql root password to do this next bit. We create the user ac
 	You will need to provide the mysql root password to do this.
 	Enter password:
 
-You could do this bit manually of course, creating two accounts in Mysql with the credentails from the MIOS config... but it's quicker this way :)
+You could do this bit manually of course, creating two accounts in MySQL with the credentails from the MIOS config... but it's quicker this way :)
 
 5) Use MIOS to download and build the latest OpenSim from git:
 
