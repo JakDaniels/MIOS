@@ -108,9 +108,9 @@ and 'osgrid' (for placing regions into the OSGrid metaverse).
 MIOS uses the default config files that come with OpenSim as a starting point for 'standalone' instances, and files provided by OSGrid for 'osgrid' instances.
 The files needed for OSGrid are downloaded as needed from their website by MIOS.
 
-You can later customise the configuration by having you own set of small .ini files that override the
-defaults in a predictable way, by providing just the setting you want. This way you *never* need to touch the default
-.ini files or those provided by OSGrid, and any customisations you provide using .ini overrides will be overlayed on top of the defaults.
+You can later customise this default OpenSim configuration by having you own set of small .ini files that override the
+defaults in a predictable way. By providing just the setting you want, in your own files, you *never* need to touch the default
+.ini files or those provided by OSGrid. Any customisations you provide using .ini overrides will be overlayed on top of the defaults.
 
 Hint: look in directory MIOS/Instances/.config/Overrides and  MIOS/Instances/[Instance Name]/Configs/Overrides
 This is where your put own OpenSim .ini file settings.
