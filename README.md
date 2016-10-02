@@ -178,20 +178,20 @@ By default if --config-set is not given then MIOS will use the downloaded 'osgri
 	# ./opensim.sh.php --add-instance Test1 --config-set osgrid
 	The Instance configs were generated successfully! Use --add-region now to add regions to this instance.
 
-### 8) Add a new region to your new instance
+### 8) Add a new region to your new Instance
 
 Example:
 
 	# ./opensim.sh.php --add-region TestRegion1 --instance Test1 --location 10000,10000 --size 512
 	Region TestRegion1 was created in Instance Test1 with UUID 8172c646-c147-efec-8476-d5e5b71ec62d on port 9005.
 	
-MIOS will not detect if the grid location is already occupied if the Instance is using a grid config such as 'osgrid', so take care to find some coordinates that are
-not already in use before doing this on a grid. It will however detect if another Instance has used these coordinates for any of it's regions.
+MIOS will not detect if the grid location is already occupied, e.g. if the Instance is using a grid config such as 'osgrid', so take care to find some coordinates that are
+not already in use before doing this on a grid Instance. It will however detect if another Instance has used these coordinates for any of it's regions.
 
 ### 9) Starting an Instance for the first time
 
-The first time a new region starts it's gonna want to ask you questions about which estate it should be part of. So.... for the first
-time, we fire up the instance manually and not under MIOS control so we can answer the interactive questions:
+The first time a new region starts it's going to want to ask you questions about which Estate it should be part of. So.... for the first
+time, we fire up the Instance manually and not under MIOS control so we can answer the interactive questions:
    
 	# ./opensim.sh.php --start Test1 --manual
 	Run this command: /home/opensim/MIOS/php_inc/os_exec.sh "/home/opensim/MIOS/Instances/Test1/ConfigOut/empty.ini" "/home/opensim/MIOS/Instances/Test1/ConfigOut/combined.ini" "/home/opensim/MIOS/Instances/Test1/Logs/OpenSim.pid"
