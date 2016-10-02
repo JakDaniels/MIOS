@@ -114,6 +114,8 @@ defaults in a predictable way. By providing just the setting you want, in your o
 
 Hint: look in directory MIOS/Instances/.config/Overrides and  MIOS/Instances/[Instance Name]/Configs/Overrides
 This is where your put own OpenSim .ini file settings.
+
+So... here we go.... let's setup the defaults configs for OpenSim:
    
 	# ./opensim.sh.php --os-config
 	Starting retrieval of config set 'standalone'...
