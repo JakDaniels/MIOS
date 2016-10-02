@@ -155,10 +155,12 @@ The loading of specific fixed release versions is not yet supported. :(
 
 It is recommended that you run this after every time you do a --os-update. Features in OpenSim change quickly on the development branch
 MIOS uses, OSGrid tracks any config changes that might occur as a result of code changes and regularly produces new base configs for the grid.
-Sometimes the default configs supplied with OpenSim change too. New options are sometimes added. We need to make sure we use the latest configs after a code update.
+Sometimes the default configs supplied with OpenSim change too. New options are sometimes added. We need to make sure we use the latest 
+default configs after a code update.
 
-7) Create your first OpenSim Instance! By default if --config-set is not given then it will use the downloaded 'osgrid' config files. This
-   can be changed in the MIOS config file.
+7) Create your first OpenSim Instance!
+
+By default if --config-set is not given then it will use the downloaded 'osgrid' config files. This can be changed in the MIOS config file.
 
 	# ./opensim.sh.php --add-instance Test1 --config-set osgrid
 	The Instance configs were generated successfully! Use --add-region now to add regions to this instance.
