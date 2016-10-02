@@ -168,7 +168,7 @@ MIOS uses, OSGrid tends to track any config changes that might occur as a result
 Sometimes the default configs supplied with OpenSim change too. New options are sometimes added. We need to make sure we use the latest 
 default configs after a code update.
 
-### 7) Create your first OpenSim Instance!
+### 7) Create your first OpenSim Instance
 
 Each OpenSim Instance has to have a set of default configs. These may be the ones supplied by the OpenSim developers for running
 in 'standalone' mode, or by a grid operator such as OSGrid to allow your regions to be a part of their grid.
@@ -178,7 +178,7 @@ By default if --config-set is not given then MIOS will use the downloaded 'osgri
 	# ./opensim.sh.php --add-instance Test1 --config-set osgrid
 	The Instance configs were generated successfully! Use --add-region now to add regions to this instance.
 
-### 8) Add a new region to your new Instance
+### 8) Add a new Region to your Instance
 
 Example:
 
@@ -190,7 +190,9 @@ not already in use before doing this on a grid Instance. It will however detect 
 
 ### 9) Starting an Instance for the first time
 
-The first time a new Instance starts it's going to want to ask you questions about which Estate it's new region(s) should be part of. So.... for the first
+The first time a new Instance starts it's going to want to ask you questions about which Estate it's new region(s) should be part of. 
+
+So.... for the first
 time we start a new Instance we use MIOS to generate the right configs and then give us a command that will start up the Instance manually and not under MIOS control so we can answer these interactive questions:
    
 	# ./opensim.sh.php --start Test1 --manual
@@ -202,7 +204,7 @@ time we start a new Instance we use MIOS to generate the right configs and then 
    before putting the instance under full MIOS control. Once the instance and its region(s) come up cleanly using the command  provided by the
    --manual parameter, you can proceed to let MIOS start, stop and monitor the instance.
    
-### 10) List the instances and regions you have created:
+### 10) List the Instances and the Regions they host
 
 	# ./opensim.sh.php --list
 
@@ -213,10 +215,10 @@ time we start a new Instance we use MIOS to generate the right configs and then 
 	| TestRegion1         | 8172c646-c147-efec-8476-d5e5b71ec62d | 50,50          | 9005  | 512x512   |
 	+-------------------------------------------------------------------------------------------------+
 
-### 11) And start all the instances
+### 11) Starting all Instances
 
 	# ./opensim.sh.php --start
 	Starting Instance: Test1...               [  OK  ]
 
-That's about it. Look at ./opensim.sh.php --help for more stuff you can do.
+That's about it for initial configuration. Have a look at ./opensim.sh.php --help for more stuff you can do,..
 
