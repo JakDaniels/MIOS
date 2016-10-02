@@ -63,13 +63,13 @@ Make sure you set a password for that account. By default on Centos 6 you will b
 account via SSH (your firewall rules permitting of course :). Of course having SSH access to your OpenSim consoles
 will be very useful later...
 
-### 2) As that user, install MIOS from github:
+### 2) As that user, install MIOS from GitHub:
 
 	# su - opensim
 	# git clone https://github.com/JakDaniels/MIOS.git
 	# cd MIOS
 
-### 3) Copy the example config and edit to fill in some values:
+### 3) Copy and edit the example config:
 
 	# cp Instances/.config/config.inc.php.example Instances/.config/config.inc.php
 	# vi Instances/.config/config.inc.php
