@@ -21,8 +21,9 @@ and optionally for a newer version of the Mono packages for Centos 6, tested to 
 	# yum install http://el6.ateb.co.uk/ateb/x86_64/RPMS/ateb-release-6-1.noarch.rpm
 
 Look at the Repo documentation at http://el6.ateb.co.uk/ for info on how to choose different Mono versions that work with OpenSim.
+
 *Disclaimer:* This is my own Repo and these Mono RPMS are provided by me, I use them myself with MIOS. You don't have to use them. Centos 6 packages
-Mono 2.10.8 in it's main Repo. This *should* work with OpenSim although I have not tested this old version :)
+Mono 2.10.8 in it's main Repo and this *should* work with OpenSim although I have not tested this older version :)
 You can also build Mono yourself from http://download.mono-project.com/sources/mono/ if you want to try other versions.
 
 Make sure these packages are installed:
