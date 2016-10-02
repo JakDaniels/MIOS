@@ -50,7 +50,7 @@ Make sure the database server is running :)
 
 	# service mysqld start
 
-# Now we need to configure MIOS.
+# Install and configure MIOS.
 
 In general, on a new system where you want to run MIOS and OpenSim do the following:
 
