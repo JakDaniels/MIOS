@@ -54,7 +54,7 @@ Make sure the database server is running :)
 
 In general, on a new system where you want to run MIOS and OpenSim do the following:
 
-1) As root, create a user that will run the OpenSim instances:
+### 1) As root, create a user that will run the OpenSim instances:
 
 	# adduser opensim
 	# passwd opensim
@@ -63,13 +63,13 @@ Make sure you set a password for that account, by default on Centos 6 you will b
 account via SSH (your firewall rules permitting of course :). Of course having SSH access to your OpenSim consoles
 will be very useful later...
 
-2) become that user and install MIOS from github:
+### 2) become that user and install MIOS from github:
 
 	# su - opensim
 	# git clone https://github.com/JakDaniels/MIOS.git
 	# cd MIOS
 
-3) Copy the example config and edit to fill in some values:
+### 3) Copy the example config and edit to fill in some values:
 
 	# cp Instances/.config/config.inc.php.example Instances/.config/config.inc.php
 	# vi Instances/.config/config.inc.php
@@ -80,7 +80,7 @@ Don't worry about setting up any actual users or databases in MySQL now, MIOS ca
 
 You will need the MySQL root password to do this next bit. We create the user accounts in MySQL that MIOS and OpenSim will use.
 
-4) Using MIOS to setup the database server:
+### 4) Using MIOS to setup the database server:
 
 	# ./opensim.sh.php --init-mysql
 	We are about to add two users to mysql, one for administering databases, and one that opensim will use for
@@ -90,7 +90,7 @@ You will need the MySQL root password to do this next bit. We create the user ac
 
 You could do this bit manually of course, creating two accounts in MySQL with the credentails from the MIOS config... but it's quicker this way :)
 
-5) Use MIOS to download and build the latest OpenSim from git:
+### 5) Use MIOS to download and build the latest OpenSim from git:
 
 	# ./opensim.sh.php --os-update
 
@@ -98,7 +98,7 @@ MIOS will download or update the OpenSim source code from git and place it at ~/
 What's important to remember here is that the code is from the dev-master branch. It changes frequently, and very occasionally may not even compile properly!
 The loading of specific fixed release versions is not yet supported. :(
 
-6) Use MIOS to grab a basic default working set of opensim configuration files.
+### 6) Use MIOS to grab a basic default working set of opensim configuration files.
 
 Each OpenSim Instance has to have a set of default configs. These may be the ones supplied by the OpenSim developers for running
 in 'standalone' mode, or by a grid operator such as OSGrid to allow your regions to be a part of their grid. In the MIOS config
@@ -166,7 +166,7 @@ MIOS uses, OSGrid tracks any config changes that might occur as a result of code
 Sometimes the default configs supplied with OpenSim change too. New options are sometimes added. We need to make sure we use the latest 
 default configs after a code update.
 
-7) Create your first OpenSim Instance!
+### 7) Create your first OpenSim Instance!
 
 Each OpenSim Instance has to have a set of default configs. These may be the ones supplied by the OpenSim developers for running
 in 'standalone' mode, or by a grid operator such as OSGrid to allow your regions to be a part of their grid.
@@ -176,7 +176,7 @@ By default if --config-set is not given then MIOS will use the downloaded 'osgri
 	# ./opensim.sh.php --add-instance Test1 --config-set osgrid
 	The Instance configs were generated successfully! Use --add-region now to add regions to this instance.
 
-8) Add a 512x512 var region to your new instance:
+### 8) Add a 512x512 var region to your new instance:
 
 	# ./opensim.sh.php --add-region TestRegion1 --instance Test1 --location 10000,10000 --size 512
 	Region TestRegion1 was created in Instance Test1 with UUID 8172c646-c147-efec-8476-d5e5b71ec62d on port 9005.
@@ -184,7 +184,7 @@ By default if --config-set is not given then MIOS will use the downloaded 'osgri
 MIOS will not detect if the grid location is already occupied on the grid, so take care to find some coordinates that are
 not already in use before doing this. It will however detect if another instance has used these coordinated for any of it's regions.
 
-9) The first time a new region starts it will ask you questions about which estate it should be part of, so for the first
+### 9) The first time a new region starts it will ask you questions about which estate it should be part of, so for the first
    time we fire up the instance manually and not under MIOS control so we can answer the interactive questions:
    
 	# ./opensim.sh.php --start Test1 --manual
@@ -196,7 +196,7 @@ not already in use before doing this. It will however detect if another instance
    before putting the instance under full MIOS control. Once the instance and its region(s) come up cleanly using the command  provided by the
    --manual parameter, you can proceed to let MIOS start, stop and monitor the instance.
    
-10) List the instances and regions you have created:
+### 10) List the instances and regions you have created:
 
 	# ./opensim.sh.php --list
 
@@ -207,7 +207,7 @@ not already in use before doing this. It will however detect if another instance
 	| TestRegion1         | 8172c646-c147-efec-8476-d5e5b71ec62d | 50,50          | 9005  | 512x512   |
 	+-------------------------------------------------------------------------------------------------+
 
-11) And start all the instances:
+### 11) And start all the instances:
 
 	# ./opensim.sh.php --start
 	Starting Instance: Test1...               [  OK  ]
