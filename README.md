@@ -94,7 +94,9 @@ You could do this bit manually of course, creating two accounts in MySQL with th
 
 	# ./opensim.sh.php --os-update
 
-MIOS will grab the opensim build tree from git and place it at ~/opensim. It will also build it in release mode.
+MIOS will download or update the OpenSim source code from git and place it at ~/opensim. It will also attempt to build it in release mode.
+What's important to remember here is that the code is from the dev-master branch. It changes frequently, and very occasionally may not even compile properly!
+The loading of specific fixed release versions is not yet supported. :(
 
 6) Use MIOS to grab a basic default working set of opensim configuration files.
 
