@@ -100,14 +100,20 @@ The loading of specific fixed release versions is not yet supported. :(
 
 6) Use MIOS to grab a basic default working set of opensim configuration files.
 
-   MIOS uses the default files that
-   come with OpenSim as a starting point for standalone instances, or files provided by a grid operator like OSGrid. (It
-   downloads them). You can later customise the configuration by having you own set of small .ini files that override the
-   defaults in a predictable way, by providing just the setting you want. This way you *never* need to touch the default
-   .ini files or those provided by OSGrid, and any customisations you provide using .ini overrides will be overlayed on top of the defaults.
-   
-   Hint: look in directory MIOS/Instances/.config/Overrides and  MIOS/Instances/[Instance Name]/Configs/Overrides
-   This is where your put own OpenSim .ini file settings.
+Each OpenSim Instance has to have a set of default configs. These may be the ones supplied by the OpenSim developers for running
+in 'standalone' mode, or by a grid operator such as OSGrid to allow your regions to be a part of their grid. In the MIOS config
+there are currently two configuration sets defined. One is for 'standalone' mode - (isolated, not connected to any other simulators)
+and 'osgrid' (for placing regions into the OSGrid metaverse).
+
+MIOS uses the default config files that come with OpenSim as a starting point for 'standalone' instances, and files provided by OSGrid for 'osgrid' instances.
+The files needed for OSGrid are downloaded as needed from their website by MIOS.
+
+You can later customise the configuration by having you own set of small .ini files that override the
+defaults in a predictable way, by providing just the setting you want. This way you *never* need to touch the default
+.ini files or those provided by OSGrid, and any customisations you provide using .ini overrides will be overlayed on top of the defaults.
+
+Hint: look in directory MIOS/Instances/.config/Overrides and  MIOS/Instances/[Instance Name]/Configs/Overrides
+This is where your put own OpenSim .ini file settings.
    
 	# ./opensim.sh.php --os-config
 	Starting retrieval of config set 'standalone'...
@@ -160,7 +166,10 @@ default configs after a code update.
 
 7) Create your first OpenSim Instance!
 
-By default if --config-set is not given then it will use the downloaded 'osgrid' config files. This can be changed in the MIOS config file.
+Each OpenSim Instance has to have a set of default configs. These may be the ones supplied by the OpenSim developers for running
+in 'standalone' mode, or by a grid operator such as OSGrid to allow your regions to be a part of their grid.
+
+By default if --config-set is not given then MIOS will use the downloaded 'osgrid' config files. This can be changed in the MIOS config file.
 
 	# ./opensim.sh.php --add-instance Test1 --config-set osgrid
 	The Instance configs were generated successfully! Use --add-region now to add regions to this instance.
