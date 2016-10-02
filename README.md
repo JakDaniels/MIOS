@@ -190,21 +190,22 @@ not already in use before doing this on a grid Instance. It will however detect 
 
 ### 9) Starting an Instance for the first time
 
-The first time a new Instance starts it's going to want to ask you questions about which Estate it's new region(s) should be part of. 
+The first time a new Instance starts it's going to want to ask you questions about which Estate it's new Region(s) should be part of. 
 
 So.... for the first
-time we start a new Instance we use MIOS to generate the right configs and then give us a command that will start up the Instance manually and not under MIOS control so we can answer these interactive questions:
+time we start a new Instance we use MIOS to generate the right configs and then give us a command that will start up the Instance manually
+and not under MIOS control so we can answer these interactive questions.
    
 	# ./opensim.sh.php --start Test1 --manual
 	Run this command: /home/opensim/MIOS/php_inc/os_exec.sh "/home/opensim/MIOS/Instances/Test1/ConfigOut/empty.ini" "/home/opensim/MIOS/Instances/Test1/ConfigOut/combined.ini" "/home/opensim/MIOS/Instances/Test1/Logs/OpenSim.pid"
 	
    Yes, this bit is a bit clumsy.... you have to run the command that is returned above. Hopefully I'll fix this.
-   Run the returned command and join the region to the estate. Then shutdown the instance (type shutdown on the opensim console).
-   Now is a good time to find and debug any other issues the instance may have in starting (like using an already occupied grid location)
-   before putting the instance under full MIOS control. Once the instance and its region(s) come up cleanly using the command  provided by the
-   --manual parameter, you can proceed to let MIOS start, stop and monitor the instance.
+   For now, run the returned command and join the region to the estate. Then shutdown the instance (type shutdown on the opensim console).
+   Now is a good time to find and debug any other issues the Instance may have in starting (like using an already occupied grid location)
+   before putting the instance under full MIOS control. Once the Instance and its Region(s) come up cleanly using the command  provided by the
+   --manual parameter, you can proceed to let MIOS start, stop and monitor the Instance.
    
-### 10) List the Instances and the Regions they host
+### 10) List the Instances and the Regions they are running
 
 	# ./opensim.sh.php --list
 
