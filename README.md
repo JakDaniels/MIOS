@@ -190,8 +190,8 @@ not already in use before doing this on a grid Instance. It will however detect 
 
 ### 9) Starting an Instance for the first time
 
-The first time a new region starts it's going to want to ask you questions about which Estate it should be part of. So.... for the first
-time, we fire up the Instance manually and not under MIOS control so we can answer the interactive questions:
+The first time a new Instance starts it's going to want to ask you questions about which Estate it's new region(s) should be part of. So.... for the first
+time we start a new Instance we use MIOS to generate the right configs and then give us a command that will start up the Instance manually and not under MIOS control so we can answer these interactive questions:
    
 	# ./opensim.sh.php --start Test1 --manual
 	Run this command: /home/opensim/MIOS/php_inc/os_exec.sh "/home/opensim/MIOS/Instances/Test1/ConfigOut/empty.ini" "/home/opensim/MIOS/Instances/Test1/ConfigOut/combined.ini" "/home/opensim/MIOS/Instances/Test1/Logs/OpenSim.pid"
