@@ -96,8 +96,9 @@ You could do this bit manually of course, creating two accounts in MySQL with th
 
 MIOS will download or update the OpenSim source code that is stored on GitHub (dev-master branch). A subdirectory 'opensim' will be created in the opensim user's home directory.
 It will also attempt to build the OpenSim code in release mode.
+
 What's important to remember here is that the code is from the dev-master branch. It changes frequently, and very occasionally may not even compile properly!
-Where the OpenSim code is fetched from is configurable in the MIOS config,but the loading of specific fixed release versions is not yet supported. :(
+The OpenSim code is fetched from a GitHub URL that is configurable in the MIOS config. At some point I want to support the loading of specific fixed release versions, but this is not yet supported. :(
 
 ### 6) Use MIOS to grab a basic default working set of opensim configuration files.
 
