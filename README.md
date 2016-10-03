@@ -82,7 +82,7 @@ You will need the MySQL root password to do this next bit. We create the user ac
 
 ### 4) Using MIOS to setup the database server
 
-	# ./opensim.sh.php --init-mysql
+	# ./mios --init-mysql
 	We are about to add two users to mysql, one for administering databases, and one that opensim will use for
 	database access.
 	You will need to provide the mysql root password to do this.
@@ -92,7 +92,7 @@ You could do this bit manually of course, creating two accounts in MySQL with th
 
 ### 5) Use MIOS to download and build the latest OpenSim from git
 
-	# ./opensim.sh.php --os-update
+	# ./mios --os-update
 
 MIOS will download or update the OpenSim source code that is stored on GitHub (dev-master branch). A subdirectory 'opensim' will be created in the opensim user's home directory.
 It will also attempt to build the OpenSim code in release mode.
@@ -119,7 +119,7 @@ This is where your put own OpenSim .ini file settings.
 
 So... here we go.... let's setup the default configs for OpenSim:
    
-	# ./opensim.sh.php --os-config
+	# ./mios --os-config
 	Starting retrieval of config set 'standalone'...
 	`/home/opensim/opensim/bin/OpenSimDefaults.ini' -> `/home/opensim/MIOS/Instances/.config/ConfigSets/standalone/OpenSimDefaults.ini'
 	`/home/opensim/opensim/bin/OpenSim.ini.example' -> `/home/opensim/MIOS/Instances/.config/ConfigSets/standalone/OpenSim.ini'
@@ -175,14 +175,14 @@ in 'standalone' mode, or by a grid operator such as OSGrid to allow your regions
 
 By default if --config-set is not given then MIOS will use the downloaded 'osgrid' config files. This can be changed in the MIOS config file.
 
-	# ./opensim.sh.php --add-instance Test1 --config-set osgrid
+	# ./mios --add-instance Test1 --config-set osgrid
 	The Instance configs were generated successfully! Use --add-region now to add regions to this instance.
 
 ### 8) Add a new Region to your Instance
 
 Example:
 
-	# ./opensim.sh.php --add-region TestRegion1 --instance Test1 --location 10000,10000 --size 512
+	# ./mios --add-region TestRegion1 --instance Test1 --location 10000,10000 --size 512
 	Region TestRegion1 was created in Instance Test1 with UUID 8172c646-c147-efec-8476-d5e5b71ec62d on port 9005.
 	
 MIOS will not detect if the grid location is already occupied, e.g. if the Instance is using a grid config such as 'osgrid', so take care to find some coordinates that are
@@ -194,7 +194,7 @@ The first time a new Instance starts it's going to want to ask you questions abo
 
 So.... for the first time we start a new Instance we tell MIOS to start the Instance in a way that we can interact with it.
    
-	# ./opensim.sh.php --start Test1 --manual
+	# ./mios --start Test1 --manual
 	Manually Starting Instance: Test1
 	
 	I am about to run this command in a tmux window:
@@ -213,7 +213,7 @@ So.... for the first time we start a new Instance we tell MIOS to start the Inst
    
 ### 10) List the Instances and the Regions they are running
 
-	# ./opensim.sh.php --list
+	# ./mios --list
 
 	+-Instance: Test1--------------------------------------------+-Config Set: osgrid-----+  *stopped
 	+------------------------------------------------------------+------------------------------------+
@@ -224,7 +224,7 @@ So.... for the first time we start a new Instance we tell MIOS to start the Inst
 
 ### 11) Starting all Instances
 
-	# ./opensim.sh.php --start
+	# ./mios --start
 	Starting Instance: Test1...               [  OK  ]
 
 That's about it for initial configuration. Try
