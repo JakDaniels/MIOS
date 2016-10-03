@@ -229,7 +229,7 @@ So.... for the first time we start a new Instance we tell MIOS to start the Inst
 
 That's about it for initial configuration. Try
 
-	~/opensim.sh.php --help
+	# ./mios --help
 
 for more stuff you can do,..
 
