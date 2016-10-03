@@ -100,7 +100,7 @@ It will also attempt to build the OpenSim code in release mode.
 What's important to remember here is that the code is from the dev-master branch. It changes frequently, and very occasionally may not even compile properly!
 The OpenSim code is fetched from a GitHub URL that is configurable in the MIOS config. At some point I want to support the loading of specific fixed release versions, but this is not yet supported. :(
 
-### 6) Use MIOS to grab a basic working set of 'default' opensim configuration files
+### 6) Use MIOS to grab a basic working set of 'default' OpenSim configuration files
 
 Each OpenSim Instance has to have a set of default configs. These may be the ones supplied by the OpenSim developers for running
 in 'standalone' mode, or by a grid operator such as OSGrid to allow your regions to be a part of their grid. In the MIOS config
@@ -236,7 +236,7 @@ Tmux is set up with the following key combos by default:
 
 * 'CTRL-a d' quits Tmux (but doesn't shut down the running Instances).
 * 'CTRL-a n' change to the next window.
-* 'CTRL-a PageUp/PageDn' scroll back through thew scroll history. 'q' to quit scrolling.
+* 'CTRL-a PageUp/PageDn' move back and forth through the scroll history. 'q' to quit scrolling. Don't ever leave Tmux in this scroll mode. It will freeze up the OpenSim Instance when the output buffer gets full!
 
 That's about it for initial configuration. Try
 
