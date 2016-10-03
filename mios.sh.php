@@ -19,7 +19,7 @@ pcntl_signal(SIGINT, "signal_handler");
 
 $argc=$_SERVER["argc"];
 $argv=$_SERVER["argv"]; //$argv is an array
-if($argc==0) error(usage());
+if($argc<=1) error(usage());
 $args=parse_args($argc,$argv);
 if(isset($args['h']) or isset($args['help'])) error(usage());
 if(isset($args['d']) or isset($args['debug'])) $debug=1; else $debug=0;
