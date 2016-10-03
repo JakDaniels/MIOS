@@ -54,7 +54,7 @@ Make sure the database server is running :)
 
 In general, on a new system where you want to run MIOS and OpenSim do the following:
 
-### 1) As root, create a user that will run the OpenSim instances
+### 1) As root, create a user that will run the OpenSim Instances
 
 	# adduser opensim
 	# passwd opensim
@@ -226,6 +226,17 @@ So.... for the first time we start a new Instance we tell MIOS to start the Inst
 
 	# ./mios --start
 	Starting Instance: Test1...               [  OK  ]
+
+MIOS runs all of it's Instances in Tmux windows. You can view all the running Instances (and a window that runs the 'top' command too) by typing:
+
+	# ./mios --view
+
+
+Tmux is set up with the following key combos by default:
+
+* 'CTRL-a d' quits Tmux (but doesn't shut down the running Instances).
+* 'CTRL-a n' change to the next window.
+* 'CTRL-a PageUp/PageDn' scroll back through thew scroll history. 'q' to quit scrolling.
 
 That's about it for initial configuration. Try
 
