@@ -63,7 +63,7 @@ if(isset($args['os-config'])) {
 	if($args['os-config']==1) $osconfs=array_keys($osconfigs); //use all config sets if none specified
 	else $osconfs=explode(",", $args['os-config']);
 	foreach($osconfs as $c) {
-		print "Staring retrieval of config set '$c'...\n";
+		print "Starting retrieval of config set '$c'...\n";
 		if(isset($osconfigs[$c])) {
 			@mkdir(CONFIG_SETS);
 			@mkdir(CONFIG_SETS."$c/");
@@ -119,14 +119,14 @@ if(isset($args['init-mysql'])) {
 	}
 	//at this point the users should be available in Mysql and we can switch to using native database calls to do MIOS stuff!
 
-	$dbs=dbsql2array3("SHOW DATABASES");
-	if(!is_array($dbs) or !in_array(ESTATE_DB,$dbs)) { //pre-create the Estate database so we can add Regions to it
-		dbquery(sprintf("CREATE DATABASE IF NOT EXISTS `%s` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci",ESTATE_DB));
-	}
-	$dbs=dbsql2array3("SHOW DATABASES");
-	if(!is_array($dbs) or !in_array(ESTATE_DB,$dbs)) die(sprintf("Could not create the Estate database named '%s'	!\n",ESTATE_DB));
-
-	$tables=dbsql2array3(sprintf("SHOW TABLES FROM `%s`",ESTATE_DB));
+	//$dbs=dbsql2array3("SHOW DATABASES");
+	//if(!is_array($dbs) or !in_array(ESTATE_DB,$dbs)) { //pre-create the Estate database so we can add Regions to it
+	//	dbquery(sprintf("CREATE DATABASE IF NOT EXISTS `%s` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci",ESTATE_DB));
+	//}
+	//$dbs=dbsql2array3("SHOW DATABASES");
+	//if(!is_array($dbs) or !in_array(ESTATE_DB,$dbs)) die(sprintf("Could not create the Estate database named '%s'	!\n",ESTATE_DB));
+	//
+	//$tables=dbsql2array3(sprintf("SHOW TABLES FROM `%s`",ESTATE_DB));
 
 	exit(0);
 }
