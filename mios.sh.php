@@ -24,7 +24,7 @@ $args=parse_args($argc,$argv);
 if(isset($args['h']) or isset($args['help'])) error(usage());
 if(isset($args['d']) or isset($args['debug'])) $debug=1; else $debug=0;
 
-$dependencies=array('/usr/bin/git','/usr/bin/tmux','/usr/bin/mono','/usr/bin/xbuild');
+$dependencies=array('/usr/bin/git','/usr/bin/tmux','/usr/bin/mono','/usr/bin/xbuild','/usr/bin/wget');
 foreach($dependencies as $d) if(!file_exists($d)) die("You are missing a dependency that is needed by MIOS! Please install package containing '$d'\n");
 
 //****************************************************************************************************UPDATE/INSTALL OPENSIM****
