@@ -46,6 +46,8 @@
 		'config-include/GridCommon.ini'		=> 'http://download.osgrid.org/GridCommon.ini.txt',
 		'config-include/FlotsamCache.ini'	=> 'http://download.osgrid.org/FlotsamCache.ini.txt'
 	);
+	
+	define('DEFAULT_CONFIG_SET','osgrid');	//what config set to use when creating an instance, as default?
 
 	define('INSTANCE_MIN_PORT',9000);
 	define('INSTANCE_MAX_PORT',9025);
