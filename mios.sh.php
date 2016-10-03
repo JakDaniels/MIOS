@@ -1058,10 +1058,10 @@ if(!$manual) {
 //****************************************************************************************************USAGE****
 function usage() {
 	return "
-opensim.sh.php [--option|--option[=]value]
+mios [--option|--option[=]value]
 
 Creates and manages OpenSimulator instances and regions. It allows you to run
-multiple instances of Opensim from one binary build of the OpenSim code.
+multiple instances of OpenSim from one binary build of the OpenSim code.
 Each Instance can run multiple regions if necessary.
 
 The options that you give to this script determine the actions taken.
@@ -1218,6 +1218,8 @@ MAX_RESTART_COUNT times of trying, the instance will be marked as broken.
            Required parameters:
   --uuid=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx    The UUID of the Region you are
                                                  renaming.
+
+MIOS is written by Jak Daniels - jak@ateb.co.uk
 ";
 }
 
