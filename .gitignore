@@ -5,7 +5,7 @@ Instances/*/*/*
 !Instances/.config/Overrides/*.ini.example
 !Instances/.config/Regions/*.ini.example
 !Instances/.config/ConfigSets/
-!Instances/.config/Stats/
+!Instances/.config/Stats/*
 Instances/.config/.runlist
 Instances/.config/.pidfile
 Instances/.config/config.inc.php
