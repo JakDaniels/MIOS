@@ -117,6 +117,17 @@ if(isset($args['init-mysql'])) {
 			@unlink(BASE_CONFIGS.'tmp.sql');
 		}
 	}
+	//at this point the users should be available in Mysql and we can switch to using native database calls to do MIOS stuff!
+
+	$dbs=dbsql2array3("SHOW DATABASES");
+	if(!is_array($dbs) or !in_array(ESTATE_DB,$dbs)) { //pre-create the Estate database so we can add Regions to it
+		dbquery(sprintf("CREATE DATABASE IF NOT EXISTS `%s` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci",ESTATE_DB));
+	}
+	$dbs=dbsql2array3("SHOW DATABASES");
+	if(!is_array($dbs) or !in_array(ESTATE_DB,$dbs)) die(sprintf("Could not create the Estate database named '%s'	!\n",ESTATE_DB));
+
+	$tables=dbsql2array3(sprintf("SHOW TABLES FROM `%s`",ESTATE_DB));
+
 	exit(0);
 }
 
@@ -524,17 +535,19 @@ if($start) {
 		$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list,$config_set);
 	}
 
-	// make sure that the os_runner daemon is running
-	if(file_exists($pidfile)) {
-		$pid=trim(file_get_contents($pidfile));
-		if(!file_exists("/proc/${pid}")) @unlink($pidfile);
-		else posix_kill($pid, SIGHUP); //trigger .runlist reload
-	}
-	if(!file_exists($pidfile)) {
-		@mkdir(OS_RUNNER_LOG_DIR);
-		$cmd=OS_RUNNER.' -d 2>/dev/null >>'.OS_RUNNER_LOG.' &';
-		if($debug) printf("Running %s\n",$cmd);
-		`exec $cmd`;
+	// make sure that the os_runner daemon is running if we're not running in manual mode
+	if(!$manual) {
+		if(file_exists($pidfile)) {
+			$pid=trim(file_get_contents($pidfile));
+			if(!file_exists("/proc/${pid}")) @unlink($pidfile);
+			else posix_kill($pid, SIGHUP); //trigger .runlist reload
+		}
+		if(!file_exists($pidfile)) {
+			@mkdir(OS_RUNNER_LOG_DIR);
+			$cmd=OS_RUNNER.' -d 2>/dev/null >>'.OS_RUNNER_LOG.' &';
+			if($debug) printf("Running %s\n",$cmd);
+			`exec $cmd`;
+		}
 	}
 
 	foreach($instances as $inst) {
@@ -664,13 +677,27 @@ if($start) {
 
 			if($manual) {
 
-				//printf("Manually Starting Instance: %s",$inst);
+				printf("Manually Starting Instance: %s\n",$inst);
 				$c_inipath=sprintf(OUT_CONF_DIR,$inst).'combined.ini';
 				$e_inipath=sprintf(OUT_CONF_DIR,$inst).'empty.ini';
 				$pidpath=sprintf(LOGS_DIR,$inst).'OpenSim.pid';
-				$cmd=sprintf("%s \"%s\" \"%s\" \"%s\"\n",OS_EXEC,$e_inipath,$c_inipath,$pidpath);
-				print "Run this command: $cmd";
-				//printf("Manually Ended Instance: %s",$inst);
+				$oscmd=sprintf("%s \"%s\" \"%s\" \"%s\"\n",OS_EXEC,$e_inipath,$c_inipath,$pidpath);
+				print "\nI am about to run this command in a tmux window:\n$oscmd\n\n";
+				$tsn="Running";
+				$tn=$inst." in manual mode. Type shutdown to exit";
+				write_text_file($tmuxfile,"set-option -g prefix ".TMUX_CONTROL_PREFIX."\nset-option -g history-limit ".TMUX_SCROLL_BUFFER."\n");
+
+				$c=5;
+				while($c) {
+					print "$c...";
+					$c--;
+					sleep(1);
+				}
+				print "\n";
+
+				$cmd="tmux new-session -s '".$tsn."' -n '".$tn."' -x 132 -y 50 '".$oscmd."'";
+				`$cmd`;
+				printf("Manually Ended Instance: %s\n",$inst);
 
 			} else {
 
@@ -961,6 +988,19 @@ if(isset($args['get-stats'])) {
 	$interfaces=get_interfaces();
 	$myip=$interfaces['eth0']['ipv4'];
 
+	//stats definitions ini files
+	$inis=array();
+	$stats_path=STATS_CONFIGS.'*.ini';
+	$stats_inis=explode("\n", trim(`ls -1 {$stats_path} 2>/dev/null`));
+	foreach($stats_inis as $si) {
+		if($si!='') {
+			if($debug) printf("- Reading config file: %s\n",$si);
+			$inis[]=parse_ini($si, true, INI_SCANNER_RAW) or array();
+		}
+	}
+	$stats_ini=ini_merge($inis);
+	print_r($stats_ini);
+
 	foreach($instances as $inst) {
 		$rs=str_replace(" ","_",$inst); //replace spaces with _ in instance names for when we create the database and tmux windows
 		$entry=sprintf("%s\t%s\t%s\t",$inst,$rs,$base_port[$inst]);
@@ -982,7 +1022,8 @@ if(isset($args['get-stats'])) {
 				if(isset($args['show'])) {
 					printf("Statistics for Instance: '%s' on url '%s'\n",$inst,$url);
 					//print_r(json_decode($json_stats,true));
-					print array_to_proc(json_decode($json_stats,true));
+					if(isset($args['no-data']))	print array_to_proc_with_no_data(json_decode($json_stats,true));
+					else print array_to_proc(json_decode($json_stats,true));
 				} else {
 
 
@@ -997,19 +1038,21 @@ if(isset($args['get-stats'])) {
 }
 //****************************************************************************************************CLEAN UP****
 //check and see if all instances are stopped, if so we can kill the os_runner daemon
-$rl=read_text_file_to_array_with_lock($runlist,LOCK_EX);
-$stopped=0;
-for($i=0;$i<count($rl);$i++) {
-	if(substr($rl[$i],-7)=='stopped' or substr($rl[$i],-8)=='disabled') $stopped++;
-}
-if($stopped==count($rl)) { //all stopped
-	if($debug) print "All Stopped! Terminating os_runner.\n";
-	if(file_exists($pidfile)) {
-		$pid=trim(file_get_contents($pidfile));
-		$cmd='kill -s 2 '.$pid;
-		if($debug) print "Running $cmd\n";
-		`$cmd`;
-		@unlink($pidfile);
+if(!$manual) {
+	$rl=read_text_file_to_array_with_lock($runlist,LOCK_EX);
+	$stopped=0;
+	for($i=0;$i<count($rl);$i++) {
+		if(substr($rl[$i],-7)=='stopped' or substr($rl[$i],-8)=='disabled') $stopped++;
+	}
+	if($stopped==count($rl)) { //all stopped
+		if($debug) print "All Stopped! Terminating os_runner.\n";
+		if(file_exists($pidfile)) {
+			$pid=trim(file_get_contents($pidfile));
+			$cmd='kill -s 2 '.$pid;
+			if($debug) print "Running $cmd\n";
+			`$cmd`;
+			@unlink($pidfile);
+		}
 	}
 }
 //****************************************************************************************************USAGE****

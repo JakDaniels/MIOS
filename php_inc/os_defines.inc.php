@@ -2,6 +2,7 @@
 define('HOME_DIR',trim(`echo ~`));
 define('BASE_DIR',HOME_DIR.'/MIOS/Instances/');
 define('BASE_CONFIGS',BASE_DIR.'.config/');
+define('STATS_CONFIGS',BASE_DIR.'.config/Stats/');
 define('CONFIG_SETS',BASE_DIR.'.config/ConfigSets/');
 define('CONFIGS_DIR',BASE_DIR.'%s/Configs/');
 define('LOGS_DIR',BASE_DIR.'%s/Logs/');

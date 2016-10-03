@@ -201,6 +201,17 @@ function array_to_proc($a,$proc='') {
 	return $out;
 }
 
+function array_to_proc_with_no_data($a,$proc='') {
+	$out='';
+	if(gettype($a)=="array") {
+		foreach($a as $k=>$v) {
+			$pre="${proc}/".str_replace('/','\/',$k);
+			$out.=array_to_proc_with_no_data($v,$pre);
+		}
+	} else $out.="${proc}\n";
+	return $out;
+}
+
 /**
 * takes a string including html unicode entities and converts it to a unicode binary encoded string
 */

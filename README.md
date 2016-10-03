@@ -192,18 +192,24 @@ not already in use before doing this on a grid Instance. It will however detect 
 
 The first time a new Instance starts it's going to want to ask you questions about which Estate it's new Region(s) should be part of. 
 
-So.... for the first
-time we start a new Instance we use MIOS to generate the right configs and then give us a command that will start up the Instance manually
-and not under MIOS control so we can answer these interactive questions.
+So.... for the first time we start a new Instance we tell MIOS to start the Instance in a way that we can interact with it.
    
 	# ./opensim.sh.php --start Test1 --manual
-	Run this command: /home/opensim/MIOS/php_inc/os_exec.sh "/home/opensim/MIOS/Instances/Test1/ConfigOut/empty.ini" "/home/opensim/MIOS/Instances/Test1/ConfigOut/combined.ini" "/home/opensim/MIOS/Instances/Test1/Logs/OpenSim.pid"
+	Manually Starting Instance: Test1
 	
-   Yes, this bit is a bit clumsy.... you have to run the command that is returned above. Hopefully I'll fix this.
-   For now, run the returned command and join the region to the estate. Then shutdown the Instance (type shutdown on the opensim console).
+	I am about to run this command in a tmux window:
+	/home/opensim/MIOS/php_inc/os_exec.sh "/home/opensim/MIOS/Instances/Test1/ConfigOut/empty.ini" "/home/opensim/MIOS/Instances/Test1/ConfigOut/combined.ini" "/home/opensim/MIOS/Instances/Test1/Logs/OpenSim.pid"
+	
+	
+	5...4...3...2...1...
+	Manually Ended Instance: Test1
+	
+   After the countdown from 5, the Instance will start in a tmux window and you will be able to interact with it, answering questions about joining the Region
+   to an Estate. Once you have done this, and you are happy that the Instance is running properly, you should type 'shutdown' on the Region console.
+
    Now is a good time to find and debug any other issues the Instance may have in starting (like using an already occupied grid location)
-   before putting the Instance under full MIOS control. Once the Instance and its Region(s) come up cleanly using the command  provided by the
-   --manual parameter, you can proceed to let MIOS start, stop and monitor the Instance.
+   before putting the Instance under full MIOS control. Once the Instance and its Region(s) come up cleanly using the --manual parameter,
+   you can proceed to let MIOS manage starting, stopping and monitoring the Instance.
    
 ### 10) List the Instances and the Regions they are running
 
