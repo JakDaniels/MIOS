@@ -224,13 +224,13 @@ So.... for the first time we start a new Instance we tell MIOS to start the Inst
 	Manually Starting Instance: Test1
 	
 	I am about to run this command in a tmux window:
-	/home/opensim/MIOS/php_inc/os_exec.sh "/home/opensim/MIOS/Instances/Test1/ConfigOut/empty.ini" "/home/opensim/MIOS/Instances/Test1/ConfigOut/combined.ini" "/home/opensim/MIOS/Instances/Test1/Logs/OpenSim.pid"
+	/home/opensim/MIOS/php_inc/os_exec.sh "/home/opensim/MIOS/Instances/Test1/ConfigOut/"
 	
 	
 	5...4...3...2...1...
 	Manually Ended Instance: Test1
 	
-   After the countdown from 5, the Instance will start in a tmux window and you will be able to interact with it, answering questions about joining the Region
+   After the countdown from 5, the Instance will start in a Tmux window and you will be able to interact with it, answering questions about joining the Region
    to an Estate. Once you have done this, and you are happy that the Instance is running properly, you should type 'shutdown' on the Region console.
 
    Now is a good time to find and debug any other issues the Instance may have in starting (like using an already occupied grid location)
@@ -253,7 +253,7 @@ So.... for the first time we start a new Instance we tell MIOS to start the Inst
 	# ./mios --start
 	Starting Instance: Test1...               [  OK  ]
 
-MIOS runs all of it's Instances in Tmux windows. You can view all the running Instances (and a window that runs the 'top' command too) by typing:
+MIOS runs all of it's Instances in Tmux windows. You can view all the running Instances (and one extra window that runs the 'top' command) by typing:
 
 	# ./mios --view
 
