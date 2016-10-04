@@ -175,7 +175,7 @@ MIOS starts building an OpenSim Instance configuration by loading these .ini fil
 THE LATER ONE APPLIES! This is true also when we come to start using .ini overrides. Any options in an override replace the default option's value.
 
 Once all the default (distro or grid supplied) .inis have been read, MIOS then proceeds to look for user supplied .ini files that override the defaults.
-These overrides can be global (i.e. they affect all Instances) or Instance specific (are applied to just one Instances configuration).
+These overrides can be global (i.e. they affect all Instances) or Instance specific (are applied to just one Instance's configuration).
 
 Have a look in directory MIOS/Instances/.config/Overrides for global (all Instances) overrides  and MIOS/Instances/[Instance Name]/Configs/Overrides for Instance
 specific overrides. There are some example files in the global directory, showing how some of the defaults may be customised. You can place as many files here as you want. They will be read in alphabetcal order.
@@ -198,7 +198,7 @@ You need to copy this and edit this file, it will be used to create basic Region
 	# cp Instances/.config/Regions/Regions.ini.example Instances/.config/Regions/Regions.ini
 	# vi Instances/.config/Regions/Regions.ini
 	
-Place any Region specific options here that you want all Regions to start with. Once you have done that we can add our first Region:
+Place any Region specific options here that you want all Regions to start with. Options go under a heading called '[Region Defaults]'. Once you have done that we can add our first Region:
 
 	# ./mios --add-region TestRegion1 --instance Test1 --location 10000,10000 --size 512
 	Region TestRegion1 was created in Instance Test1 with UUID 8172c646-c147-efec-8476-d5e5b71ec62d on port 9005.
