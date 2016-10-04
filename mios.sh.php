@@ -678,10 +678,9 @@ if($start) {
 			if($manual) {
 
 				printf("Manually Starting Instance: %s\n",$inst);
-				$c_inipath=sprintf(OUT_CONF_DIR,$inst).'combined.ini';
-				$e_inipath=sprintf(OUT_CONF_DIR,$inst).'empty.ini';
+				$inipath=sprintf(OUT_CONF_DIR,$inst);
 				$pidpath=sprintf(LOGS_DIR,$inst).'OpenSim.pid';
-				$oscmd=sprintf("%s \"%s\" \"%s\" \"%s\"\n",OS_EXEC,$e_inipath,$c_inipath,$pidpath);
+				$oscmd=sprintf("%s \"%s\"\n",OS_EXEC,$inipath);
 				print "\nI am about to run this command in a tmux window:\n$oscmd\n\n";
 				$tsn="Running";
 				$tn=$inst." in manual mode. Type shutdown to exit";
@@ -703,6 +702,7 @@ if($start) {
 
 				printf("Starting Instance: %s",$inst);
 				$entry=sprintf("%s\t%s\t%s",$inst,$rs,$base_port[$inst]);
+				$inipath=sprintf(OUT_CONF_DIR,$inst);
 				$pidpath=sprintf(LOGS_DIR,$inst).'OpenSim.pid';
 				$cstatus='stopped'; //default if no entry found
 				$timer=0;
@@ -720,7 +720,7 @@ if($start) {
 						if(isset($args['f']) or isset($args['fixed'])) $cstatus='stopped';
 						else {
 							print "\r\t\t\t\t\t\t[FAILED] Instance appears to be broken! Use -f to force start.\n";
-							printf("\tor to try a manual unmanaged start you can invoke the instance with: %s \"%s\" \"%s\" \"%s\"\n",OS_EXEC,$e_inipath,$c_inipath,$pidpath);
+							printf("\tor to try a manual unmanaged start you can invoke the instance with: %s \"%s\"\n",OS_EXEC,$inipath);
 							break;
 						}
 					}
@@ -739,7 +739,7 @@ if($start) {
 					}
 					if($cstatus=='stop') {
 						print "\r\t\t\t\t\t\t[FAILED] Instance is still stopping!\n";
-						printf("\tTo try a manual unmanaged start you can invoke the instance with: %s \"%s\" \"%s\" \"%s\"\n",OS_EXEC,$e_inipath,$c_inipath,$pidpath);
+						printf("\tTo try a manual unmanaged start you can invoke the instance with: %s \"%s\"\n",OS_EXEC,$inipath);
 						break;
 					}
 					sleep(2);
@@ -747,7 +747,7 @@ if($start) {
 					print ".";
 					if($timer>=TIMEOUT) {
 						printf("\r\t\t\t\t\t\t[FAILED] Instance did not start within %s seconds!\n",TIMEOUT);
-						printf("\tTo try a manual unmanaged start you can invoke the instance with: %s \"%s\" \"%s\" \"%s\"\n",OS_EXEC,$e_inipath,$c_inipath,$pidpath);
+						printf("\tTo try a manual unmanaged start you can invoke the instance with: %s \"%s\"\n",OS_EXEC,$inipath);
 						break;
 					}
 				}

@@ -5,5 +5,5 @@ export MONO_THREADS_PER_CPU=4096
 export MONO_GC_PARAMS="nursery-size=128m"
 
 cd ~/opensim/bin
-#exec mono --gc=sgen OpenSim.exe -inimaster="$1" -inifile="$2"
-exec mono --desktop OpenSim.exe -inimaster="$1" -inifile="$2"
+#exec mono --gc=sgen OpenSim.exe -inimaster="${1}empty.ini" -inifile="${1}combined.ini"
+exec mono --desktop OpenSim.exe -inimaster="${1}empty.ini" -inifile="${1}combined.ini"
