@@ -1060,9 +1060,9 @@ function usage() {
 	return "
 mios [--option|--option[=]value]
 
-Creates and manages OpenSimulator instances and regions. It allows you to run
-multiple instances of OpenSim from one binary build of the OpenSim code.
-Each Instance can run multiple regions if necessary.
+Creates and manages OpenSimulator Instances and Regions. It allows you to run
+multiple Instances of OpenSim from one binary build of the OpenSim code.
+Each Instance can run multiple Regions if necessary.
 
 The options that you give to this script determine the actions taken.
 The values, if provided must be enclosed in quotes (\") if the value contains
@@ -1074,20 +1074,18 @@ spaces.
 
 --os-update
            Install or Update the OpenSim binaries using the latest dev code
-           from git master. The version is built in release mode. This command
-           is equivalent to:
+           from git master. The version is built in release mode. For an initial
+           install this command is equivalent to:
 
-           cd ~; git clone https://github.com/opensim/opensim.git &&
+           cd ~; git clone ".OPENSIM_GIT_REPOSITORY." &&
              ./runprebuild.sh autoclean && ./runprebuild.sh vs2010 &&
              xbuild /p:Configuration=Release
 
-           ...if it's an initial install or:
+           Or for an update:
 
            cd ~/opensim; git pull && xbuild /t:clean &&
              ./runprebuild.sh autoclean && ./runprebuild.sh vs2010 &&
              xbuild /p:Configuration=Release
-
-           ...for an update.
 
 --rebuild
            Same as above except don't attempt to update from git, just rebuild
@@ -1110,7 +1108,7 @@ spaces.
 
 --init-mysql
            Add the two users to Mysql that are required to manage and run
-           Opensim Instances. The users are: 'opensim' which have full access
+           Opensim Instances. The users are: 'opensim' which has full access
            to each Instance database and the Estate database, and
            'opensim_admin' which is used to create the Instance databases when
            an Instance is added using this script. The host, user and password
@@ -1121,83 +1119,85 @@ spaces.
 **Managing OpenSim Instances**
 **--------------------------**
 
---inst     Displays a quick list of all the configured instances. Each instance
+--inst     Displays a quick list of all the configured Instances. Each Instance
            has a unique name which is used to identify it.
 
---list     Displays a detailed table of all the configured instances and the
-           Regions that each instance is running. It also shows each instance's
+--list     Displays a detailed table of all the configured Instances and the
+           Regions that each Instance is running. It also shows each Instance's
            status, e.g. running, stopped, unconfigured etc.
 
 --list [InstanceName[,InstanceName]...]
-           Displays a detailed table of the specified single instance or the
-           comma separated list of instances. As above it shows the Regions
-           that they are running. It also shows each instance's status, e.g.
+           Displays a detailed table of the specified single Instance or the
+           comma separated list of Instances. As above it shows the Regions
+           that they are running. It also shows each Instance's status, e.g.
            running, stopped, unconfigured etc.
 
 
 --add-instance InstanceName
-           Creates a new instance, that is it creates an new directory called
+           Creates a new Instance, that is it creates an new directory called
            'InstanceName' and fills that directory with the base configs that
-           are required to control that instance. You will need to add at least
-           one Region to the instance in order to be able to start and stop the
-           instance.
+           are required to control that Instance. You will need to add at least
+           one Region to the Instance in order to be able to start and stop the
+           Instance.
      [--config-set ConfigSetName] Specifies which set of *base* configs we will
-           use for this instance. These can be grid or standalone config sets
+           use for this Instance. These can be grid or standalone config sets
            and the sources for those configs are defined in config.inc.php.
 
 --del-instance InstanceName
            Deletes an Instance by removing all of its configs and it's
-           associated database. All regions on that instance will be destroyed!
-           An instance can only be deleted if it is first stopped and also set
+           associated database. All Regions on that Instance will be destroyed!
+           An Instance can only be deleted if it is first stopped and also set
            to disabled.
 
 --start [InstanceName[,InstanceName]...] [--manual]
-           Attempt to start all or just the named instances. If an instance for
+           Attempt to start all or just the named Instances. If an Instance for
            some reason does not start in a timely manner, it will show [FAILED].
-           If --manual is specified then the instance will be started manually
-           from the current shell and will run in interactive mode until
-           shutdown from the OpenSim console.
+           If --manual is specified then the Instance will be started manually
+           in a Tmux window and will run in interactive mode until shutdown
+           from the OpenSim console.
 
 --stop [InstanceName[,InstanceName]...]
-           Attempt to stop all or just the named instances. If an instance for
+           Attempt to stop all or just the named Instances. If an Instance for
            some reason does not stop in a timely manner, it will show [FAILED].
 
 --restart [InstanceName[,InstanceName]...]
-           Attempt to restart all or just the named instances. If an instance
+           Attempt to restart all or just the named Instances. If an Instance
            for some reason does not stop or start in a timely manner, it will
            show as [FAILED].
 
 --status [InstanceName[,InstanceName]...]
-           Shows the running status of all or just the named instances.
+           Shows the running status of all or just the named Instances.
 
 --view [InstanceName]
            Switch to the console display and optionally select the window for
-           the instance InstanceName. The console display(s) run in TMUX, and
-           the usual TMUX keys are used to switch panes, scroll and exit etc.
+           the Instance InstanceName. The console display(s) run in Tmux, and
+           the usual Tmux keys, prefixed with CTRL-a are used to switch panes,
+           scroll and exit etc.
 
 --visitors [InstanceName[,InstanceName]...]
-           Show the visitors that have arrived at the regions hosted by the
-           named instances.
+           Scan the logs and show the visitors that have arrived at the Regions
+           hosted by the named Instances.
 
 --config [InstanceName[,InstanceName]...]
-           Show the running config of all or just the named instances. An
-           instance must have been previously started for the config to exist.
+           Show the running config of all or just the named Instances. An
+           Instance must have been previously started for the config to exist.
   [--section Name[,Name]...] View only a particular section or sections of the
                              configuration.
 
 --disable [InstanceName[,InstanceName]...]
-           Attempt to disable all or just the named instances. An instance
+           Attempt to disable all or just the named Instances. An Instance
            must be stopped before you can disable it, otherwise the operation
-           will show as [FAILED].
+           will show as [FAILED]. Disabled Instances will never be started by
+           MIOS.
 
 --enable [InstanceName[,InstanceName]...]
-           Attempt to enable all or just the named instances. An instance
+           Attempt to enable all or just the named Instances. An Instance
            must be disabled before you can enable it, otherwise the operation
            will show as [FAILED].
 
-If an instance crashes while running, it will be attempted to be restarted.
-If it starts and then dies within MAX_RESTART_TIME_INTERVAL seconds then after
-MAX_RESTART_COUNT times of trying, the instance will be marked as broken.
+If an Instance crashes while running, it will be attempted to be restarted.
+If it starts and then dies within ".MAX_RESTART_TIME_INTERVAL." seconds then after ".MAX_RESTART_COUNT." times of trying,
+the Instance will be marked as broken.
 
 **-----------------------------------------**
 **Managing Regions within OpenSim Instances**
@@ -1205,7 +1205,7 @@ MAX_RESTART_COUNT times of trying, the instance will be marked as broken.
 
 --add-region RegionName
            Required parameters:
-  --instance InstanceName   The instance name that the Region will be added to.
+  --instance InstanceName   The Instance name that the Region will be added to.
   --location xxxxx,yyyyy    Position on the grid for the new Region
 
            Optional Parameters (values auto generated if not specified):

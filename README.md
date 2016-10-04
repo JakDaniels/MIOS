@@ -211,7 +211,7 @@ How does MIOS handle Regions?
 MIOS uses the default Regions.ini as a starting point. Then it overlays or overrides setting from .ini files that are defined per Instance.
 You would place these Region specific .ini files in folder MIOS/Instances/[Instance Name]/Configs/Regions (for the example Instance created above that would be
 MIOS/Instances/Test1/Configs/Regions). You can place as many files here as you want. They will be read in alphabetcal order. The syntax is the same a the global Regions.ini file, in
-that setting are placed under a [heading] which is the name of the Region.
+that setting are placed under a [Heading] which is the name of the Region to which they should apply.
 
 
 ### 9) Starting an Instance for the first time
