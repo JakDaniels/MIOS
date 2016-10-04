@@ -98,16 +98,16 @@ MIOS will download or update the OpenSim source code that is stored on GitHub (d
 It will also attempt to build the OpenSim code in release mode.
 
 What's important to remember here is that the code is from the dev-master branch. It changes frequently, and very occasionally may not even compile properly!
-The OpenSim code is fetched from a GitHub URL that is configurable in the MIOS config. At some point I want to support the loading of specific fixed release versions, but this is not yet supported. :(
+The OpenSim code is fetched from a GitHub URL that is configurable in the MIOS main configuration file (Instances/.config/config.inc.php). At some point I want to support the loading of specific fixed release versions, but this is not yet supported. :(
 
 ### 6) Use MIOS to grab a basic working set of 'default' OpenSim configuration files
 
 Each OpenSim Instance has to have a set of default configs. These may be the ones supplied by the OpenSim developers for running
-in 'standalone' mode, or by a grid operator such as OSGrid to allow your regions to be a part of their grid. In the MIOS config
+in 'standalone' mode, or by a grid operator such as OSGrid to allow your regions to be a part of their grid. In the MIOS main configuration file (Instances/.config/config.inc.php)
 there are currently two configuration sets defined. One is for 'standalone' mode - (isolated, not connected to any other simulators)
 and 'osgrid' (for placing regions into the OSGrid metaverse).
 
-MIOS uses the default config files that come with OpenSim as a starting point for 'standalone' instances, and files provided by OSGrid for 'osgrid' instances.
+MIOS uses the default .ini files that come with OpenSim as a starting point for 'standalone' instances, and files provided by OSGrid for 'osgrid' instances.
 The files needed for OSGrid are downloaded as needed from their website by MIOS.
 
 You can later customise this default OpenSim configuration by having you own set of small .ini files that override the
