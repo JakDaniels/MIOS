@@ -98,12 +98,14 @@ MIOS will download or update the OpenSim source code that is stored on GitHub (d
 It will also attempt to build the OpenSim code in release mode.
 
 What's important to remember here is that the code is from the dev-master branch. It changes frequently, and very occasionally may not even compile properly!
-The OpenSim code is fetched from a GitHub URL that is configurable in the MIOS main configuration file (Instances/.config/config.inc.php). At some point I want to support the loading of specific fixed release versions, but this is not yet supported. :(
+The OpenSim code is fetched from a GitHub URL that is configurable in the MIOS main configuration file (MIOS/Instances/.config/config.inc.php). At some point I want to support the loading of specific fixed release versions, but this is not yet supported. :(
 
 ### 6) Use MIOS to grab a basic working set of 'default' OpenSim configuration files
 
 Each OpenSim Instance has to have a set of default configs. These may be the ones supplied by the OpenSim developers for running
-in 'standalone' mode, or by a grid operator such as OSGrid to allow your regions to be a part of their grid. In the MIOS main configuration file (Instances/.config/config.inc.php)
+in 'standalone' mode, or by a grid operator such as OSGrid to allow your regions to be a part of their grid.
+
+In the MIOS main configuration file (MIOS/Instances/.config/config.inc.php)
 there are currently two configuration sets defined. One is for 'standalone' mode - (isolated, not connected to any other simulators)
 and 'osgrid' (for placing regions into the OSGrid metaverse).
 
@@ -167,16 +169,16 @@ default configs after a code update.
 
 So.... how does MIOS build the final configuration for each Instance?
 
-First you must tell MIOS which *config set* it should use for each Instance. Have a look in the MIOS main configuration file (Instances/.config/config.inc.php)
+First you must tell MIOS which *config set* it should use for each Instance. Have a look in the MIOS main configuration file (MIOS/Instances/.config/config.inc.php)
 and you will see two config sets, one for 'standalone' and one for 'osgrid'. There is a list of .ini files in each config set (and where to get them or download them from).
 MIOS starts building an OpenSim Instance configuration by loading these .ini files in the order given. In all cases if an option is listed twice in different .ini files, then
-THE LATER ONE APPLIES! This is true also when we come to start using .ini Overrides. Any options in an Override replace the default option's value.
+THE LATER ONE APPLIES! This is true also when we come to start using .ini overrides. Any options in an override replace the default option's value.
 
 Once all the default (distro or grid supplied) .inis have been read, MIOS then proceeds to look for user supplied .ini files that override the defaults.
 These overrides can be global (i.e. they affect all Instances) or Instance specific (are applied to just one Instances configuration).
 
 Have a look in directory MIOS/Instances/.config/Overrides for global (all Instances) overrides  and MIOS/Instances/[Instance Name]/Configs/Overrides for Instance
-specific overrides. There are some example files in the global directory, showing how some of the defaults may be customised.
+specific overrides. There are some example files in the global directory, showing how some of the defaults may be customised. You can place as many files here as you want. They will be read in alphabetcal order.
 
 ### 7) Create your first OpenSim Instance
 
@@ -190,13 +192,27 @@ By default if --config-set is not given then MIOS will use the downloaded 'osgri
 
 ### 8) Add a new Region to your Instance
 
-Example:
+Before we add a new Region or Regions we need to make sure we start with a sensible set of defaults. Have in look at file MIOS/Instances/.config/Regions/Regions.ini.example
+You need to copy this and edit this file, it will be used to create basic Regions.ini files for each Region you add.
+
+	# cp Instances/.config/Regions/Regions.ini.example Instances/.config/Regions/Regions.ini
+	# vi Instances/.config/Regions/Regions.ini
+	
+Place any Region specific options here that you want all Regions to start with. Once you have done that we can add our first Region:
 
 	# ./mios --add-region TestRegion1 --instance Test1 --location 10000,10000 --size 512
 	Region TestRegion1 was created in Instance Test1 with UUID 8172c646-c147-efec-8476-d5e5b71ec62d on port 9005.
 	
 MIOS will not detect if the grid location is already occupied, e.g. if the Instance is using a grid config such as 'osgrid', so take care to find some coordinates that are
-not already in use before doing this on a grid Instance. It will however detect if another Instance has used these coordinates for any of it's regions.
+not already in use before doing this on a grid Instance. It will however detect if another Instance has used these coordinates for any of it's Regions.
+
+How does MIOS handle Regions?
+
+MIOS uses the default Regions.ini as a starting point. Then it overlays or overrides setting from .ini files that are defined per Instance.
+You would place these Region specific .ini files in folder MIOS/Instances/[Instance Name]/Configs/Regions (for the example Instance created above that would be
+MIOS/Instances/Test1/Configs/Regions). You can place as many files here as you want. They will be read in alphabetcal order. The syntax is the same a the global Regions.ini file, in
+that setting are placed under a [heading] which is the name of the Region.
+
 
 ### 9) Starting an Instance for the first time
 
