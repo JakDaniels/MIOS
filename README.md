@@ -114,10 +114,7 @@ You can later customise this default OpenSim configuration by having you own set
 defaults in a predictable way. By providing just the setting you want, in your own files, you *never* need to touch the default
 .ini files or those provided by OSGrid. Any customisations you provide using .ini overrides will be overlayed on top of the defaults.
 
-Hint: look in directory MIOS/Instances/.config/Overrides and  MIOS/Instances/[Instance Name]/Configs/Overrides
-This is where your put own OpenSim .ini file settings.
-
-So... here we go.... let's setup the default configs for OpenSim:
+So... here we go.... let's first setup the default configs for OpenSim:
    
 	# ./mios --os-config
 	Starting retrieval of config set 'standalone'...
@@ -167,6 +164,19 @@ It is recommended that you run this after every time you do a --os-update. Featu
 MIOS uses, OSGrid tends to track any config changes that might occur as a result of code changes (within a day or so) and regularly produces new base configs for the grid.
 Sometimes the default configs supplied with OpenSim change too. New options are sometimes added. We need to make sure we use the latest 
 default configs after a code update.
+
+So.... how does MIOS build the final configuration for each Instance?
+
+First you must tell MIOS which *config set* it should use for each Instance. Have a look in the MIOS main configuration file (Instances/.config/config.inc.php)
+and you will see two config sets, one for 'standalone' and one for 'osgrid'. There is a list of .ini files in each config set (and where to get them or download them from).
+MIOS starts building an OpenSim Instance configuration by loading these .ini files in the order given. In all cases if an option is listed twice in different .ini files, then
+THE LATER ONE APPLIES! This is true also when we come to start using .ini Overrides. Any options in an Override replace the default option's value.
+
+Once all the default (distro or grid supplied) .inis have been read, MIOS then proceeds to look for user supplied .ini files that override the defaults.
+These overrides can be global (i.e. they affect all Instances) or Instance specific (are applied to just one Instances configuration).
+
+Have a look in directory MIOS/Instances/.config/Overrides for global (all Instances) overrides  and MIOS/Instances/[Instance Name]/Configs/Overrides for Instance
+specific overrides. There are some example files in the global directory, showing how some of the defaults may be customised.
 
 ### 7) Create your first OpenSim Instance
 
