@@ -517,7 +517,31 @@ if($stop) {
 		}
 	}
 
-	if($restart) $start=$stopped_instances; //only restart stopped instances
+	if($restart) {
+		$start=$stopped_instances; 	//only restart stopped instances
+		sleep(5);										//and wait a few seconds between stopping and starting
+	}
+}
+//****************************************************************************************************CLEAN UP****
+//check and see if all instances are stopped, if so we can kill the os_runner daemon
+//we do this even if part of a --restart as os_runner.sh.php might have been updated
+//and we want always be using latest code.
+if(!$manual) {
+	$rl=read_text_file_to_array_with_lock($runlist,LOCK_EX);
+	$stopped=0;
+	for($i=0;$i<count($rl);$i++) {
+		if(substr($rl[$i],-7)=='stopped' or substr($rl[$i],-8)=='disabled') $stopped++;
+	}
+	if($stopped==count($rl)) { //all stopped
+		if($debug) print "All Stopped! Terminating os_runner.\n";
+		if(file_exists($pidfile)) {
+			$pid=trim(file_get_contents($pidfile));
+			$cmd='kill -s 2 '.$pid;
+			if($debug) print "Running $cmd\n";
+			`$cmd`;
+			@unlink($pidfile);
+		}
+	}
 }
 //****************************************************************************************************START INSTANCE(S)*************
 if($start) {
