@@ -85,6 +85,7 @@ function make_instance_directories($inst) {
 	@mkdir(sprintf(OUT_CONF_DIR.'Regions/',$inst));
 	@mkdir(sprintf(SCRIPTS_DIR,$inst));
 	@mkdir(sprintf(LOGS_DIR,$inst));
+	@mkdir(sprintf(STATS_DIR,$inst));
 	@mkdir(sprintf(CONFIGS_DIR,$inst));
 	@mkdir(sprintf(CONFIGS_DIR.'Regions/',$inst));
 	@mkdir(sprintf(CONFIGS_DIR.'Overrides/',$inst));
@@ -136,10 +137,10 @@ function enum_instance($inst,&$used_ports,&$used_uuids,&$base_port,&$regions_lis
 	$regions_list[$inst]=$regions;
 	foreach($regions as $region) {
 		$uuid='';
-		if(isset($rini[$region]['RegionUUID']) and try_parse_uuid($rini[$region]['RegionUUID'],$uuid)) $used_uuids[]=$uuid;
+		if(isset($rini[$region]['RegionUUID']) and try_parse_uuid($rini[$region]['RegionUUID'],$uuid)) $used_uuids[$inst.'/'.$region]=$uuid;
 		$port=0;
 		if(isset($rini[$region]['InternalPort']) and try_parse_port($rini[$region]['InternalPort'],$port)) {
-			$used_ports[]=$port;
+			$used_ports[$inst.'/'.$region]=$port;
 			//remember lowest region port number for the instance
 			if($port<$base_port[$inst]) $base_port[$inst]=$port;
 		}
@@ -152,7 +153,7 @@ function enum_instance($inst,&$used_ports,&$used_uuids,&$base_port,&$regions_lis
 			while(in_array($uuid,$used_uuids)) $uuid=create_uuid();
 			if($debug) printf("- Allocation new UUID %s to instance %s, region %s\n",$uuid,$inst,$region);
 			$rini[$region]['RegionUUID']='"'.$uuid.'"';
-			$used_uuids[]=$uuid;
+			$used_uuids[$inst.'/'.$region]=$uuid;
 			$updated=1;
 		}
 		$port=0;
@@ -162,7 +163,7 @@ function enum_instance($inst,&$used_ports,&$used_uuids,&$base_port,&$regions_lis
 			if($port>INSTANCE_MAX_PORT) die(sprintf("Could not allocate a port to instance %s, region %s!\n",$inst,$region));
 			if($debug) printf("- Allocation new port %d to instance %s, region %s\n",$port,$inst,$region);
 			$rini[$region]['InternalPort']=$port;
-			$used_ports[]=$port;
+			$used_ports[$inst.'/'.$region]=$port;
 			//remember lowest region port number for the instance
 			if($port<$base_port[$inst]) $base_port[$inst]=$port;
 			$updated=1;
@@ -201,6 +202,65 @@ function enum_instance($inst,&$used_ports,&$used_uuids,&$base_port,&$regions_lis
 	}
 	$config_set=get_instance_config_set($inst); //which config set does this instance use?
 	return $info;
+}
+
+function create_rrd_db($rrd_file,$rrd_date,$d) {
+	global $debug;
+	$ds=$d['DataSets'];
+	if($debug) printf("Constructing RRD database file '%s' with %s datasets.\n",$rrd_file,$ds);
+	$rrd_types=explode(',',RRD_TYPES);
+	$rrd[]='--start';
+	$rrd[]=$rrd_date;
+	$rrd[]='--step';
+	$rrd[]=RRD_STAT_UPDATE_INTERVAL;
+	for($i=1;$i<=$ds;$i++) {
+		if(isset($d["Data${i}"])) {
+			if(isset($d["Data${i}Min"]) and preg_match("/^[0-9U]+$/",$d["Data${i}Min"])) $dataMin=strip_quoted_string($d["Data${i}Min"]); else $dataMin='0';
+			if(isset($d["Data${i}Max"]) and preg_match("/^[0-9U]+$/",$d["Data${i}Min"])) $dataMax=strip_quoted_string($d["Data${i}Max"]); else $dataMax='U';
+			if(isset($d["Data${i}Type"]) and in_array($d["Data${i}Type"],$rrd_types)) $dataType=strip_quoted_string($d["Data${i}Type"]); else $dataType='GAUGE';
+			$dataDS="DS${i}";
+			$rrd[]=sprintf('DS:%s:%s:%s:%s:%s',$dataDS,$dataType,RRD_STAT_UPDATE_INTERVAL,$dataMin,$dataMax);
+		}
+	}
+	$rrd[]=sprintf('RRA:MAX:%s:%s',RRD_XFF,RRD_RRA_MIN);
+	$rrd[]=sprintf('RRA:MAX:%s:%s',RRD_XFF,RRD_RRA_5MIN);
+	$rrd[]=sprintf('RRA:MAX:%s:%s',RRD_XFF,RRD_RRA_HOUR);
+	$rrd[]=sprintf('RRA:MAX:%s:%s',RRD_XFF,RRD_RRA_DAY);
+	if($debug>1) print_r($rrd);
+	if(!rrd_create($rrd_file,$rrd)) printf("Error: %s  creating RRD database '%s'\n",rrd_error(),$rrd_file);
+	return $rrd;
+}
+
+function update_rrd_db($rrd_file,$rrd_date,$d,$stats,$config,$env) {
+	global $debug;
+	$ds=$d['DataSets'];
+	if($debug) printf("Processing environment: %s\n",$env);
+	eval($env);
+	if($debug) printf("Updating RRD database file '%s' with %s datasets.\n",$rrd_file,$ds);
+	$rrd_types=explode(',',RRD_TYPES);
+	$template=array();
+	for($i=1;$i<=$ds;$i++) $template[]="DS${i}";
+	$rrd=array('--template',implode(":",$template));
+	$data=array();
+	for($i=1;$i<=$ds;$i++) {
+		if(isset($d["Data${i}"])) {
+			if(isset($d["Data${i}Min"]) and preg_match("/^[0-9U]+$/",$d["Data${i}Min"])) $dataMin=strip_quoted_string($d["Data${i}Min"]); else $dataMin='0';
+			if(isset($d["Data${i}Max"]) and preg_match("/^[0-9U]+$/",$d["Data${i}Min"])) $dataMax=strip_quoted_string($d["Data${i}Max"]); else $dataMax='U';
+			if(isset($d["Data${i}Type"]) and in_array($d["Data${i}Type"],$rrd_types)) $dataType=strip_quoted_string($d["Data${i}Type"]); else $dataType='GAUGE';
+			$data_keys=explode("||",strip_quoted_string($d["Data${i}"]));
+			$dataKey='';
+			foreach($data_keys as $k) $dataKey.='["'.$k.'"]';
+			$value=0;
+			$eval_string=sprintf('$value=%s%s;','$stats',$dataKey);
+			if($debug>1) printf("Evaluating %s",$eval_string);
+			@eval($eval_string);
+			if($debug>1) printf(" - Value is '%s'\n",$value);
+			$data[]=sprintf('%s:%s',$rrd_date,$value);
+		} else $data[]=sprintf('%s:%s',$rrd_date,0);
+	}
+	$rrd[]=implode(":",$data);
+	if($debug>1) print_r($rrd);
+	if(!rrd_update($rrd_file,$rrd)) printf("Error: %s\n",rrd_error());
 }
 
 function signals($signal) {

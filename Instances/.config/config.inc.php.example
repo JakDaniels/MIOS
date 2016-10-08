@@ -74,6 +74,11 @@
 	
 	define('OPENSIM_GIT_REPOSITORY','git://opensimulator.org/git/opensim');
 
+	// a list of the RRDTool datatypes we can use in stats.
+	$rrd_types=array('GAUGE','COUNTER','DERIVE','DCOUNTER','DDERIVE','ABSOLUTE','COMPUTE');
+	
+	define('RRD_STAT_UPDATE_INTERVAL',60); //how often will we be updating the stats? If you change this you will need to reinitialise the RRD databases.
+
 	date_default_timezone_set('Europe/London');
 
 ?>

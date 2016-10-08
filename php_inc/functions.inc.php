@@ -189,6 +189,16 @@ function array_to_xml($array) {
 	return $xml;
 }
 
+function array_visualise($a,$proc='') {
+	$out='';
+	if(gettype($a)=="array") {
+		foreach($a as $k=>$v) {
+			$pre="${proc}[".$k."]";
+			$out.=array_visualise($v,$pre);
+		}
+	} else $out.="${proc} := ".$a."\n";
+	return $out;
+}
 
 function array_to_proc($a,$proc='') {
 	$out='';
@@ -366,6 +376,12 @@ function parse_ini($filepath) {
 		$result[$sections[ $j ]] = $values[$j];
 	}
 	return $result + $globals;
+}
+
+function strip_quoted_string($value) {
+	if(substr($value,0,1)=='"') $value=substr($value,1);
+	if(substr($value,-1,1)=='"') $value=substr($value,0,-1);
+	return $value;
 }
 
 function ini_merge($inis) {

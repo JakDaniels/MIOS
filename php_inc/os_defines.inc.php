@@ -6,6 +6,7 @@ define('STATS_CONFIGS',BASE_DIR.'.config/Stats/');
 define('CONFIG_SETS',BASE_DIR.'.config/ConfigSets/');
 define('CONFIGS_DIR',BASE_DIR.'%s/Configs/');
 define('LOGS_DIR',BASE_DIR.'%s/Logs/');
+define('STATS_DIR',BASE_DIR.'%s/Stats/');
 define('SCRIPTS_DIR',BASE_DIR.'%s/ScriptEngines/');
 define('OUT_CONF_DIR',BASE_DIR.'%s/ConfigOut/');
 define('OS_ROOT_DIR',HOME_DIR.'/opensim/');

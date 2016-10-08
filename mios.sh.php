@@ -22,7 +22,9 @@ $argv=$_SERVER["argv"]; //$argv is an array
 if($argc<=1) error(usage());
 $args=parse_args($argc,$argv);
 if(isset($args['h']) or isset($args['help'])) error(usage());
-if(isset($args['d']) or isset($args['debug'])) $debug=1; else $debug=0;
+$debug=0;
+if(isset($args['d'])) $debug=$args['d'];
+if(isset($args['debug'])) $debug=$args['debug'];
 
 $dependencies=array('/usr/bin/git','/usr/bin/tmux','/usr/bin/mono','/usr/bin/xbuild','/usr/bin/wget');
 foreach($dependencies as $d) if(!file_exists($d)) die("You are missing a dependency that is needed by MIOS! Please install package containing '$d'\n");
@@ -1003,10 +1005,10 @@ if(isset($args['get-stats'])) {
 		$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list,$config_set);
 	}
 
-	print_r($used_ports);
-	print_r($used_uuids);
-	print_r($base_port);
-	print_r($regions_list);
+	//print_r($used_ports);
+	//print_r($used_uuids);
+	//print_r($base_port);
+	//print_r($regions_list);
 
 	$rl=read_text_file_to_array_with_lock($runlist,LOCK_EX);
 	$interfaces=get_interfaces();
@@ -1023,7 +1025,8 @@ if(isset($args['get-stats'])) {
 		}
 	}
 	$stats_ini=ini_merge($inis);
-	print_r($stats_ini);
+
+	$rrd_date=time();
 
 	foreach($instances as $inst) {
 		$rs=str_replace(" ","_",$inst); //replace spaces with _ in instance names for when we create the database and tmux windows
@@ -1045,12 +1048,53 @@ if(isset($args['get-stats'])) {
 				$json_stats=get_data_from_url($url);
 				if(isset($args['show'])) {
 					printf("Statistics for Instance: '%s' on url '%s'\n",$inst,$url);
-					//print_r(json_decode($json_stats,true));
-					if(isset($args['no-data']))	print array_to_proc_with_no_data(json_decode($json_stats,true));
-					else print array_to_proc(json_decode($json_stats,true));
+					if(isset($args['json'])) print $json_stats."\n";
+					else print array_visualise(json_decode($json_stats,true));
 				} else {
 
+					$stats=json_decode($json_stats,true);
 
+					//create rrd database if needed and populate them with data
+					@mkdir(sprintf(STATS_DIR,$inst));
+					$rrd_base=sprintf(STATS_DIR,$inst);
+					foreach($stats_ini as $h=>$d) {
+						if(!isset($d['DataSets'])) {
+							printf("Warning - Stats definition '%s' has no datasets defined!\n",$h);
+							continue;
+						}
+						$ds=$d['DataSets'];
+						$has_region_stats=0;
+						$has_interface_stats=0;
+						for($i=1;$i<=$ds;$i++) {
+							if(isset($d["Data${i}"])) {
+								if(strpos($d["Data${i}"],'${RegionName}')!==false) $has_region_stats=1;
+								if(strpos($d["Data${i}"],'${Interface}')!==false) $has_interface_stats=1;
+							}
+						}
+						$base_env=sprintf("\$BasePort='%s'; ",$base_port[$inst]);
+						if($has_region_stats) {
+							foreach($regions_list[$inst] as $region) {
+								$rrd_file=sprintf("%s%s_%s.rrd",$rrd_base,$used_uuids[$inst.'/'.$region],preg_replace(array("/[^A-Z0-9\ ]/i","/[\ ]/"),array("","_"),$h));
+								if(!file_exists($rrd_file)) create_rrd_db($rrd_file,$rrd_date,$d);
+								$env=$base_env.sprintf("\$RegionName='%s'; ",$region);
+								update_rrd_db($rrd_file,$rrd_date,$d,$stats,$ini,$env);
+							}
+						} elseif($has_interface_stats) {
+							foreach($interfaces as $interface=>$idata) {
+								$rrd_file=sprintf("%s%s_%s.rrd",$rrd_base,$interface,preg_replace(array("/[^A-Z0-9\ ]/i","/[\ ]/"),array("","_"),$h));
+								if(!file_exists($rrd_file)) create_rrd_db($rrd_file,$rrd_date,$d);
+								$env=$base_env.sprintf("\$Interface='%s'; ",$interface);
+								update_rrd_db($rrd_file,$rrd_date,$d,$stats,$ini,$env);
+							}
+						} else {
+							$rrd_file=sprintf("%s%s.rrd",$rrd_base,preg_replace(array("/[^A-Z0-9\ ]/i","/[\ ]/"),array("","_"),$h));
+							if(!file_exists($rrd_file)) create_rrd_db($rrd_file,$rrd_date,$d);
+							$env=$base_env;
+							update_rrd_db($rrd_file,$rrd_date,$d,$stats,$ini,$env);
+						}
+
+
+					}
 
 
 
