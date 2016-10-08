@@ -990,6 +990,22 @@ if(is_array($enable)) {
 	}
 }
 //****************************************************************************************************STATS****
+if(isset($args['init-stats'])) {
+	//set up crontab for the user
+	$cronlines =sprintf("PATH=/sbin:/bin:/usr/sbin:/usr/bin:%s\n",MIOS_DIR);
+	$cronlines.=sprintf("MAILTO=%s\n",MAIL_TO);
+	$cronlines.=sprintf("HOME=%s\n",HOME_DIR);
+	$cronlines.=sprintf("* * * * * %smios.sh.php --get-stats 2>&1 >>%smios_cron.log\n",MIOS_DIR,OS_RUNNER_LOG_DIR);
+	$crontab=BASE_CONFIGS.'mios_crontab.txt';
+	if($fp=@fopen($crontab,'wb')) {
+		fwrite($fp,$cronlines);
+		fclose($fp);
+	}
+	`crontab -r`;
+	`crontab $crontab`;
+	$args['get-stats']=1;
+}
+
 if(isset($args['get-stats'])) {
 
 	if($args['get-stats']==1) $inst=$instances; else $inst=explode(',',str_replace('"','',trim($args['get-stats'])));
@@ -1004,12 +1020,6 @@ if(isset($args['get-stats'])) {
 	foreach($instances as $inst) {
 		$info=enum_instance($inst,$used_ports,$used_uuids,$base_port,$regions_list,$config_set);
 	}
-
-	//print_r($used_ports);
-	//print_r($used_uuids);
-	//print_r($base_port);
-	//print_r($regions_list);
-
 	$rl=read_text_file_to_array_with_lock($runlist,LOCK_EX);
 	$interfaces=get_interfaces();
 	$myip=$interfaces['eth0']['ipv4'];
@@ -1045,70 +1055,71 @@ if(isset($args['get-stats'])) {
 			$ini=parse_ini($c_inipath, true, INI_SCANNER_RAW) or array();
 			if(isset($ini['Startup']['ManagedStatsRemoteFetchURI'])) {
 				$url=sprintf('http://%s:%s/%s/',$myip,$base_port[$inst],$ini['Startup']['ManagedStatsRemoteFetchURI']);
+				printf("%s Getting Stats for Instance '%s'\t\t",date('Y-m-d H:i:s'),$inst);
 				$json_stats=get_data_from_url($url);
-				if(isset($args['show'])) {
-					printf("Statistics for Instance: '%s' on url '%s'\n",$inst,$url);
-					if(isset($args['json'])) print $json_stats."\n";
-					else print array_visualise(json_decode($json_stats,true));
-				} else {
 
-					$stats=json_decode($json_stats,true);
+				if(substr($json_stats,0,2)=='{"') {
 
-					//create rrd database if needed and populate them with data
-					@mkdir(sprintf(STATS_DIR,$inst));
-					$rrd_base=sprintf(STATS_DIR,$inst);
-					foreach($stats_ini as $h=>$d) {
-						if(!isset($d['DataSets'])) {
-							printf("Warning - Stats definition '%s' has no datasets defined!\n",$h);
-							continue;
-						}
-						$ds=$d['DataSets'];
-						$has_region_stats=0;
-						$has_interface_stats=0;
-						for($i=1;$i<=$ds;$i++) {
-							if(isset($d["Data${i}"])) {
-								if(strpos($d["Data${i}"],'${RegionName}')!==false) $has_region_stats=1;
-								if(strpos($d["Data${i}"],'${Interface}')!==false) $has_interface_stats=1;
+					print "[  OK  ]\n";
+					if(isset($args['show'])) {
+						printf("Statistics for Instance: '%s' on url '%s'\n",$inst,$url);
+						if(isset($args['json'])) print $json_stats."\n";
+						else print array_visualise(json_decode($json_stats,true));
+					} else {
+
+						$stats=json_decode($json_stats,true);
+
+						//create rrd database if needed and populate them with data
+						@mkdir(sprintf(STATS_DIR,$inst));
+						$rrd_base=sprintf(STATS_DIR,$inst);
+						foreach($stats_ini as $h=>$d) {
+							if(!isset($d['DataSets'])) {
+								printf("Warning - Stats definition '%s' has no datasets defined!\n",$h);
+								continue;
 							}
-						}
-						$base_env=sprintf("\$BasePort='%s'; \$InventoryServerURI='%s';",$base_port[$inst],$ini['InventoryService']['InventoryServerURI']);
-						if($has_region_stats) {
-							foreach($regions_list[$inst] as $region) {
-								$rrd_file=sprintf("%s%s_%s.rrd",$rrd_base,$used_uuids[$inst.'/'.$region],preg_replace(array("/[^A-Z0-9\ ]/i","/[\ ]/"),array("","_"),$h));
-								if(!file_exists($rrd_file) or isset($args['init-stats'])) {
-									create_rrd_db($rrd_file,$rrd_date,$d);
-								} else {
-									$env=$base_env.sprintf("\$RegionName='%s'; ",$region);
-									update_rrd_db($rrd_file,$rrd_date,$d,$stats,$env);
+							$ds=$d['DataSets'];
+							$has_region_stats=0;
+							$has_interface_stats=0;
+							for($i=1;$i<=$ds;$i++) {
+								if(isset($d["Data${i}"])) {
+									if(strpos($d["Data${i}"],'${RegionName}')!==false) $has_region_stats=1;
+									if(strpos($d["Data${i}"],'${Interface}')!==false) $has_interface_stats=1;
 								}
 							}
-						} elseif($has_interface_stats) {
-							foreach($interfaces as $interface=>$idata) {
-								$rrd_file=sprintf("%s%s_%s.rrd",$rrd_base,$interface,preg_replace(array("/[^A-Z0-9\ ]/i","/[\ ]/"),array("","_"),$h));
-								if(!file_exists($rrd_file) or isset($args['init-stats'])) {
-									create_rrd_db($rrd_file,$rrd_date,$d);
-								} else {
-									$env=$base_env.sprintf("\$Interface='%s'; ",$interface);
-									update_rrd_db($rrd_file,$rrd_date,$d,$stats,$env);
+							$base_env=sprintf("\$BasePort='%s'; \$InventoryServerURI='%s';",$base_port[$inst],$ini['InventoryService']['InventoryServerURI']);
+							if($has_region_stats) {
+								foreach($regions_list[$inst] as $region) {
+									$rrd_file=sprintf("%s%s_%s.rrd",$rrd_base,$used_uuids[$inst.'/'.$region],preg_replace(array("/[^A-Z0-9\ ]/i","/[\ ]/"),array("","_"),$h));
+									if(!file_exists($rrd_file) or isset($args['init-stats'])) {
+										create_rrd_db($rrd_file,$rrd_date,$d);
+									} else {
+										$env=$base_env.sprintf("\$RegionName='%s'; ",$region);
+										update_rrd_db($rrd_file,$rrd_date,$d,$stats,$env);
+									}
 								}
-							}
-						} else {
-							$rrd_file=sprintf("%s%s.rrd",$rrd_base,preg_replace(array("/[^A-Z0-9\ ]/i","/[\ ]/"),array("","_"),$h));
-							if(!file_exists($rrd_file) or isset($args['init-stats'])) {
-								create_rrd_db($rrd_file,$rrd_date,$d);
+							} elseif($has_interface_stats) {
+								foreach($interfaces as $interface=>$idata) {
+									$rrd_file=sprintf("%s%s_%s.rrd",$rrd_base,$interface,preg_replace(array("/[^A-Z0-9\ ]/i","/[\ ]/"),array("","_"),$h));
+									if(!file_exists($rrd_file) or isset($args['init-stats'])) {
+										create_rrd_db($rrd_file,$rrd_date,$d);
+									} else {
+										$env=$base_env.sprintf("\$Interface='%s'; ",$interface);
+										update_rrd_db($rrd_file,$rrd_date,$d,$stats,$env);
+									}
+								}
 							} else {
-								$env=$base_env;
-								update_rrd_db($rrd_file,$rrd_date,$d,$stats,$env);
+								$rrd_file=sprintf("%s%s.rrd",$rrd_base,preg_replace(array("/[^A-Z0-9\ ]/i","/[\ ]/"),array("","_"),$h));
+								if(!file_exists($rrd_file) or isset($args['init-stats'])) {
+									create_rrd_db($rrd_file,$rrd_date,$d);
+								} else {
+									$env=$base_env;
+									update_rrd_db($rrd_file,$rrd_date,$d,$stats,$env);
+								}
 							}
 						}
-
-
 					}
 
-
-
-
-				}
+				} else print "[FAILED]\n";
 			} else if($debug) printf("Instance '%s' is not configured to provide stats! Please set ManagedStatsRemoteFetchURI in [Startup] section of .ini\n",$inst);
 		} else if($debug) printf("Instance '%s' must be started in order to provide stats!\n",$inst);
 	}
@@ -1271,6 +1282,26 @@ spaces.
            Attempt to enable all or just the named Instances. An Instance
            must be disabled before you can enable it, otherwise the operation
            will show as [FAILED].
+
+--init-stats [InstanceName[,InstanceName]...]
+           Initiase MIOS to collect stats. A crontab entry will be created for
+           the current user and MIOS will be called with the --get-stats option
+           every minute. Data is stored in a number of RRD databases per
+           Instance, which are created automatically.
+
+--get-stats [InstanceName[,InstanceName]...]
+           Normally called via a crontab entry every minute. Updates the RRD
+           databases with OpenSim statistics.
+  [--show [--json]] Instead of updating the RRD database, just show the data
+                    collected in a readable format, or in a json format.
+
+--graph-stats [InstanceName[,InstanceName]...]
+          Required parameters:
+  --start unixtime
+  --end unixtime
+					Produce pretty set of graphs for all or just the named Instances,
+					and for a given time period.
+					*NOT IMPLEMENTED YET!*
 
 If an Instance crashes while running, it will be attempted to be restarted.
 If it starts and then dies within ".MAX_RESTART_TIME_INTERVAL." seconds then after ".MAX_RESTART_COUNT." times of trying,

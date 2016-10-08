@@ -75,10 +75,18 @@
 	define('OPENSIM_GIT_REPOSITORY','git://opensimulator.org/git/opensim');
 
 	// a list of the RRDTool datatypes we can use in stats.
-	$rrd_types=array('GAUGE','COUNTER','DERIVE','DCOUNTER','DDERIVE','ABSOLUTE','COMPUTE');
-	
-	define('RRD_STAT_UPDATE_INTERVAL',60); //how often will we be updating the stats? If you change this you will need to reinitialise the RRD databases.
+	define('RRD_TYPES','GAUGE,COUNTER,DERIVE,DCOUNTER,DDERIVE,ABSOLUTE,COMPUTE');
 
+	// If you change these RRD settings you will need to re-initialise the RRD databases.
+	define('RRD_STAT_UPDATE_INTERVAL',60); //how often will we be updating the stats in seconds?
+	define('RRD_XFF',0.5);
+	define('RRD_RRA_MIN','1:1440'); //consolidate to 1 datapoint every min, store one day's worth
+	define('RRD_RRA_5MIN','5:2016'); //consolidate to 1 datapoint every 5 mins, store one week's worth
+	define('RRD_RRA_HOUR','60:1344'); //consolidate to 1 datapoint an hour, store eight week's worth
+	define('RRD_RRA_DAY','1440:1095'); //consolidate to 1 datapoint an day, store three year's worth
+
+	define('MAIL_TO',''); //where do we email stuff to?
+	
 	date_default_timezone_set('Europe/London');
 
 ?>

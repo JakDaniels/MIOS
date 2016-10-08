@@ -237,7 +237,7 @@ function update_rrd_db($rrd_file,$rrd_date,$d,$stats,$env) {
 	$ds=$d['DataSets'];
 	if(isset($d['DataMultiplier']) and preg_match("/^[0-9]+$/",$d['DataMultiplier'])) $dm=$d['DataMultiplier'];
 	else $dm=1;
-	if($debug) printf("Processing environment: %s\n",$env);
+	//if($debug) printf("Processing environment: %s\n",$env);
 	eval($env);
 	if($debug) printf("Updating RRD database file '%s' with %s datasets.\n",$rrd_file,$ds);
 	$rrd_types=explode(',',RRD_TYPES);
