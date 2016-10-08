@@ -205,7 +205,7 @@ function enum_instance($inst,&$used_ports,&$used_uuids,&$base_port,&$regions_lis
 }
 
 function create_rrd_db($rrd_file,$rrd_date,$d) {
-	global $debug;
+	global $debug,$args;
 	$ds=$d['DataSets'];
 	if($debug) printf("Constructing RRD database file '%s' with %s datasets.\n",$rrd_file,$ds);
 	$rrd_types=explode(',',RRD_TYPES);
@@ -227,13 +227,16 @@ function create_rrd_db($rrd_file,$rrd_date,$d) {
 	$rrd[]=sprintf('RRA:MAX:%s:%s',RRD_XFF,RRD_RRA_HOUR);
 	$rrd[]=sprintf('RRA:MAX:%s:%s',RRD_XFF,RRD_RRA_DAY);
 	if($debug>1) print_r($rrd);
+	if(isset($args['init-stats'])) `rm -f $rrd_file 2>/dev/null`;
 	if(!rrd_create($rrd_file,$rrd)) printf("Error: %s  creating RRD database '%s'\n",rrd_error(),$rrd_file);
 	return $rrd;
 }
 
-function update_rrd_db($rrd_file,$rrd_date,$d,$stats,$config,$env) {
+function update_rrd_db($rrd_file,$rrd_date,$d,$stats,$env) {
 	global $debug;
 	$ds=$d['DataSets'];
+	if(isset($d['DataMultiplier']) and preg_match("/^[0-9]+$/",$d['DataMultiplier'])) $dm=$d['DataMultiplier'];
+	else $dm=1;
 	if($debug) printf("Processing environment: %s\n",$env);
 	eval($env);
 	if($debug) printf("Updating RRD database file '%s' with %s datasets.\n",$rrd_file,$ds);
@@ -250,11 +253,17 @@ function update_rrd_db($rrd_file,$rrd_date,$d,$stats,$config,$env) {
 			$data_keys=explode("||",strip_quoted_string($d["Data${i}"]));
 			$dataKey='';
 			foreach($data_keys as $k) $dataKey.='["'.$k.'"]';
-			$value=0;
-			$eval_string=sprintf('$value=%s%s;','$stats',$dataKey);
-			if($debug>1) printf("Evaluating %s",$eval_string);
+			$eval_string=sprintf('if(isset(%s%s)) $value=%s%s; else $value=0;','$stats',$dataKey,'$stats',$dataKey);
+			if($debug>1) printf("Evaluating %s\n",$eval_string);
 			@eval($eval_string);
-			if($debug>1) printf(" - Value is '%s'\n",$value);
+			if(!isset($value)) $value=0; //shouldn't happen unless there is a parsing error
+			if($debug>1) printf("Got value: %s * %s = %s",$value,$dm,$value*$dm);
+			$value=$value*$dm; //data multiplier
+			if($dataType=='COUNTER') {
+				$value=round($value,0);
+				if($debug>1) printf(", type is COUNTER, rounding to %s",$value);
+			}
+			if($debug>1) print "\n";
 			$data[]=sprintf('%s:%s',$rrd_date,$value);
 		} else $data[]=sprintf('%s:%s',$rrd_date,0);
 	}

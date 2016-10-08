@@ -1071,26 +1071,35 @@ if(isset($args['get-stats'])) {
 								if(strpos($d["Data${i}"],'${Interface}')!==false) $has_interface_stats=1;
 							}
 						}
-						$base_env=sprintf("\$BasePort='%s'; ",$base_port[$inst]);
+						$base_env=sprintf("\$BasePort='%s'; \$InventoryServerURI='%s';",$base_port[$inst],$ini['InventoryService']['InventoryServerURI']);
 						if($has_region_stats) {
 							foreach($regions_list[$inst] as $region) {
 								$rrd_file=sprintf("%s%s_%s.rrd",$rrd_base,$used_uuids[$inst.'/'.$region],preg_replace(array("/[^A-Z0-9\ ]/i","/[\ ]/"),array("","_"),$h));
-								if(!file_exists($rrd_file)) create_rrd_db($rrd_file,$rrd_date,$d);
-								$env=$base_env.sprintf("\$RegionName='%s'; ",$region);
-								update_rrd_db($rrd_file,$rrd_date,$d,$stats,$ini,$env);
+								if(!file_exists($rrd_file) or isset($args['init-stats'])) {
+									create_rrd_db($rrd_file,$rrd_date,$d);
+								} else {
+									$env=$base_env.sprintf("\$RegionName='%s'; ",$region);
+									update_rrd_db($rrd_file,$rrd_date,$d,$stats,$env);
+								}
 							}
 						} elseif($has_interface_stats) {
 							foreach($interfaces as $interface=>$idata) {
 								$rrd_file=sprintf("%s%s_%s.rrd",$rrd_base,$interface,preg_replace(array("/[^A-Z0-9\ ]/i","/[\ ]/"),array("","_"),$h));
-								if(!file_exists($rrd_file)) create_rrd_db($rrd_file,$rrd_date,$d);
-								$env=$base_env.sprintf("\$Interface='%s'; ",$interface);
-								update_rrd_db($rrd_file,$rrd_date,$d,$stats,$ini,$env);
+								if(!file_exists($rrd_file) or isset($args['init-stats'])) {
+									create_rrd_db($rrd_file,$rrd_date,$d);
+								} else {
+									$env=$base_env.sprintf("\$Interface='%s'; ",$interface);
+									update_rrd_db($rrd_file,$rrd_date,$d,$stats,$env);
+								}
 							}
 						} else {
 							$rrd_file=sprintf("%s%s.rrd",$rrd_base,preg_replace(array("/[^A-Z0-9\ ]/i","/[\ ]/"),array("","_"),$h));
-							if(!file_exists($rrd_file)) create_rrd_db($rrd_file,$rrd_date,$d);
-							$env=$base_env;
-							update_rrd_db($rrd_file,$rrd_date,$d,$stats,$ini,$env);
+							if(!file_exists($rrd_file) or isset($args['init-stats'])) {
+								create_rrd_db($rrd_file,$rrd_date,$d);
+							} else {
+								$env=$base_env;
+								update_rrd_db($rrd_file,$rrd_date,$d,$stats,$env);
+							}
 						}
 
 
