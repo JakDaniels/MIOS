@@ -1,0 +1,113 @@
+body.page_body {
+	font-family: Arial, Verdana;
+	margin: 5px;
+	padding: 5px;
+}
+
+.instances_view {
+	border: 1px solid black;
+	background-color: #f0f0e0;
+	padding: 20px;
+	height: 95%;
+	margin: 5px;
+}
+
+ul.tabs1, ul.tabs2 {
+	margin: 0;
+	margin-left: 0;
+	margin-right: 0;
+	padding: 0;
+	float: left;
+	list-style: none;
+	height: 32px; /*--Set height of tabs--*/
+	border-bottom: 1px solid #999;
+	border-left: 1px solid #999;
+	width: 100%;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	-moz-border-radius-topleft: 5px;
+	-khtml-border-radius-topleft: 5px;
+	-webkit-border-top-left-radius: 5px;
+	-moz-border-radius-topright: 5px;
+	-khtml-border-radius-topright: 5px;
+	-webkit-border-top-right-radius: 5px;
+}
+
+ul.tabs1 li, ul.tabs2 li {
+	float: left;
+	margin: 0;
+	padding: 0;
+	height: 31px; /*--Subtract 1px from the height of the unordered list--*/
+	line-height: 31px; /*--Vertically aligns the text within the tab--*/
+	border: 1px solid #999;
+	border-left: none;
+	margin-bottom: -1px; /*--Pull the list item down 1px--*/
+	overflow: hidden;
+	position: relative;
+	background: #e0e0e0;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	
+	-moz-border-radius-topleft: 5px;
+	-khtml-border-radius-topleft: 5px;
+	-webkit-border-top-left-radius: 5px;
+	-moz-border-radius-topright: 5px;
+	-khtml-border-radius-topright: 5px;
+	-webkit-border-top-right-radius: 5px;
+
+}
+ul.tabs1 li a, ul.tabs2 li a {
+	text-decoration: none;
+	color: #000;
+	display: block;
+	font-size: 0.8em;
+	padding: 0 5px;
+	border: 1px solid #fff; /*--Gives the bevel look with a 1px white border inside the list item--*/
+	outline: none;
+}
+ul.tabs1 li a:hover, ul.tabs2 li a:hover {
+	background: #ccc;
+}
+/*--Makes sure that the active tab does not listen to the hover properties--*/
+html ul.tabs1 li.active1, html ul.tabs1 li.active1 a:hover { 
+	background: #fff;
+	border-bottom: 1px solid #fff; /*--Makes the active tab look like it's connected with its content--*/
+}
+html ul.tabs2 li.active2, html ul.tabs2 li.active2 a:hover { 
+	background: #fff;
+	border-bottom: 1px solid #fff; /*--Makes the active tab look like it's connected with its content--*/
+}
+.tab_container {
+	border: 1px solid #999;
+	border-top: none;
+	overflow: hidden;
+	clear: both;
+	float: left; 
+	width: 100%;
+	min-height: 300px;
+	background: #fff;
+	padding: 10px;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+	-moz-border-radius-bottomright: 5px;
+	-khtml-border-radius-bottomright: 5px;
+	-webkit-border-bottom-right-radius: 5px;
+	-moz-border-radius-bottomleft: 5px;
+	-khtml-border-radius-bottomleft: 5px;
+	-webkit-border-bottom-left-radius: 5px;
+}
+
+table.stats_display {
+	font-size: 0.8em;
+}
+
+.graph_container {
+	vertical-align: top;
+	padding: 5px;
+}
+.graph {
+	border 1px solid silver;
+}
+.hilite {
+	background-color: #ffffc0;
+}
