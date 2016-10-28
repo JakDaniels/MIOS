@@ -405,8 +405,11 @@ function ini_merge($inis) {
 	return $sorted;
 }
 
-function write_ini($filepath,$ini) {
+function write_ini($filepath,$ini,$comment='') {
 	if($fp=@fopen($filepath,'wb')) {
+		if($comment!='') {
+			fwrite($fp,";\t${comment}\n\n");
+		}
 		foreach($ini as $section=>$data) {
 			fwrite($fp,"[".$section."]\n");
 			foreach($data as $k=>$v) {

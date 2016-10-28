@@ -11,3 +11,5 @@ Instances/.config/.pidfile
 Instances/.config/config.inc.php
 Instances/.config/ConfigSets/*
 Logs/*
+web/img_cache/*
+!web/img_cache/error.png

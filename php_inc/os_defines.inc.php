@@ -1,5 +1,8 @@
 <?php
-define('HOME_DIR',trim(`echo ~`));
+//define('HOME_DIR',trim(`echo ~`));
+$mydir=__DIR__;
+$mydir=substr($mydir,0,strpos($mydir,'MIOS')-1);
+define('HOME_DIR',$mydir);
 define('MIOS_DIR',HOME_DIR.'/MIOS/');
 define('BASE_DIR',MIOS_DIR.'Instances/');
 define('BASE_CONFIGS',BASE_DIR.'.config/');
@@ -17,6 +20,7 @@ define('OS_RUNNER',INC_DIR.'os_runner.sh.php');
 define('OS_RUNNER_LOG_DIR',MIOS_DIR.'Logs/');
 define('OS_RUNNER_LOG',OS_RUNNER_LOG_DIR.'os_runner.log');
 define('OS_EXEC',INC_DIR.'os_exec.sh');
+define('GRAPH_DIR',MIOS_DIR.'web/img_cache/');
 
 //some of these get used in dbfunctions
 define("DEBUG",0);

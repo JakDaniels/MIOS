@@ -85,6 +85,9 @@
 	define('RRD_RRA_HOUR','60:1344'); //consolidate to 1 datapoint an hour, store eight week's worth
 	define('RRD_RRA_DAY','1440:1095'); //consolidate to 1 datapoint an day, store three year's worth
 
+	define('RRD_GRAPH_WIDTH',500);
+	define('RRD_GRAPH_HEIGHT',250);
+
 	define('MAIL_TO',''); //where do we email stuff to?
 	
 	date_default_timezone_set('Europe/London');

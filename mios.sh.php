@@ -143,6 +143,7 @@ $tmuxfile=HOME_DIR.'/.tmux.conf';
 if(isset($args['add-instance'])) {
 	$inst=$args['add-instance'];
 	if($inst===1) die("You must specify an instance name to add!\n");
+	if(!preg_match("/^[A-Z0-9\_\-]+$/i",$inst)) die("Instance names can only contain letters, numbers, underscore and hyphen!\n");
 	if(in_array($inst,$instances)) die("An Instance of that name already exists!\n");
 
 	if(isset($args['config-set'])) $cs=$args['config-set'];
@@ -1037,6 +1038,7 @@ if(isset($args['get-stats'])) {
 	$stats_ini=ini_merge($inis);
 
 	$rrd_date=time();
+	$rrd_data=array();
 
 	foreach($instances as $inst) {
 		$rs=str_replace(" ","_",$inst); //replace spaces with _ in instance names for when we create the database and tmux windows
@@ -1072,6 +1074,7 @@ if(isset($args['get-stats'])) {
 						//create rrd database if needed and populate them with data
 						@mkdir(sprintf(STATS_DIR,$inst));
 						$rrd_base=sprintf(STATS_DIR,$inst);
+						$gc=0;
 						foreach($stats_ini as $h=>$d) {
 							if(!isset($d['DataSets'])) {
 								printf("Warning - Stats definition '%s' has no datasets defined!\n",$h);
@@ -1080,6 +1083,7 @@ if(isset($args['get-stats'])) {
 							$ds=$d['DataSets'];
 							$has_region_stats=0;
 							$has_interface_stats=0;
+
 							for($i=1;$i<=$ds;$i++) {
 								if(isset($d["Data${i}"])) {
 									if(strpos($d["Data${i}"],'${RegionName}')!==false) $has_region_stats=1;
@@ -1087,28 +1091,63 @@ if(isset($args['get-stats'])) {
 								}
 							}
 							$base_env=sprintf("\$BasePort='%s'; \$InventoryServerURI='%s';",$base_port[$inst],$ini['InventoryService']['InventoryServerURI']);
+							$rrd_graph=array();
 							if($has_region_stats) {
+								$sgc=1;
 								foreach($regions_list[$inst] as $region) {
 									$rrd_file=sprintf("%s%s_%s.rrd",$rrd_base,$used_uuids[$inst.'/'.$region],preg_replace(array("/[^A-Z0-9\ ]/i","/[\ ]/"),array("","_"),$h));
+									$rrd_graph["Graph${sgc}DataFile"]=$rrd_file;
+									$rrd_graph["Graph${sgc}Heading"]=$h;
+									$rrd_graph["Graph${sgc}DataUnits"]=$d['DataUnits'];
+									$rrd_graph["Graph${sgc}Instance"]=$inst;
+									$rrd_graph["Graph${sgc}LastTimeStamp"]=$rrd_date;
+									$rrd_graph["Graph${sgc}Region"]=$region;
+									$rrd_graph["Graph${sgc}RegionUUID"]=$used_uuids[$inst.'/'.$region];
+									for($i=1;$i<=$ds;$i++) {
+										$rrd_graph["Graph${sgc}DataSource${i}"]="DS${i}";
+										$rrd_graph["Graph${sgc}DataLabel${i}"]=$d["Data${i}Label"];
+									}
 									if(!file_exists($rrd_file) or isset($args['init-stats'])) {
 										create_rrd_db($rrd_file,$rrd_date,$d);
 									} else {
 										$env=$base_env.sprintf("\$RegionName='%s'; ",$region);
 										update_rrd_db($rrd_file,$rrd_date,$d,$stats,$env);
 									}
+									$sgc++;
 								}
 							} elseif($has_interface_stats) {
+								$sgc=1;
 								foreach($interfaces as $interface=>$idata) {
 									$rrd_file=sprintf("%s%s_%s.rrd",$rrd_base,$interface,preg_replace(array("/[^A-Z0-9\ ]/i","/[\ ]/"),array("","_"),$h));
+									$rrd_graph["Graph${sgc}DataFile"]=$rrd_file;
+									$rrd_graph["Graph${sgc}Heading"]=$h;
+									$rrd_graph["Graph${sgc}DataUnits"]=$d['DataUnits'];
+									$rrd_graph["Graph${sgc}Instance"]=$inst;
+									$rrd_graph["Graph${sgc}LastTimeStamp"]=$rrd_date;
+									$rrd_graph["Graph${sgc}Interface"]=$interface;
+									for($i=1;$i<=$ds;$i++) {
+										$rrd_graph["Graph${sgc}DataSource${i}"]="DS${i}";
+										$rrd_graph["Graph${sgc}DataLabel${i}"]=$d["Data${i}Label"];
+									}
 									if(!file_exists($rrd_file) or isset($args['init-stats'])) {
 										create_rrd_db($rrd_file,$rrd_date,$d);
 									} else {
 										$env=$base_env.sprintf("\$Interface='%s'; ",$interface);
 										update_rrd_db($rrd_file,$rrd_date,$d,$stats,$env);
 									}
+									$sgc++;
 								}
 							} else {
 								$rrd_file=sprintf("%s%s.rrd",$rrd_base,preg_replace(array("/[^A-Z0-9\ ]/i","/[\ ]/"),array("","_"),$h));
+								$rrd_graph["Graph1DataFile"]=$rrd_file;
+								$rrd_graph["Graph1Heading"]=$h;
+								$rrd_graph["Graph1DataUnits"]=$d['DataUnits'];
+								$rrd_graph["Graph1Instance"]=$inst;
+								$rrd_graph["Graph1LastTimeStamp"]=$rrd_date;
+								for($i=1;$i<=$ds;$i++) {
+									$rrd_graph["Graph1DataSource${i}"]="DS${i}";
+									$rrd_graph["Graph1DataLabel${i}"]=$d["Data${i}Label"];
+								}
 								if(!file_exists($rrd_file) or isset($args['init-stats'])) {
 									create_rrd_db($rrd_file,$rrd_date,$d);
 								} else {
@@ -1116,13 +1155,15 @@ if(isset($args['get-stats'])) {
 									update_rrd_db($rrd_file,$rrd_date,$d,$stats,$env);
 								}
 							}
+							$rrd_data["${inst}:${gc}"]=$rrd_graph;
+							$gc++;
 						}
 					}
-
 				} else print "[FAILED]\n";
 			} else if($debug) printf("Instance '%s' is not configured to provide stats! Please set ManagedStatsRemoteFetchURI in [Startup] section of .ini\n",$inst);
 		} else if($debug) printf("Instance '%s' must be started in order to provide stats!\n",$inst);
 	}
+	write_ini(STATS_CONFIGS.'.Graphs.ini',$rrd_data,'DO NOT EDIT THIS FILE! It is created automatically for the graphing tools.');
 }
 //****************************************************************************************************CLEAN UP****
 //check and see if all instances are stopped, if so we can kill the os_runner daemon
