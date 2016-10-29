@@ -71,7 +71,7 @@ $ds--;
 
 $rrdoptions=array('--start',$rrdstart,'--end',$rrdend,'--title',$rrdtitle,
 									'--width',RRD_GRAPH_WIDTH,'--height',RRD_GRAPH_HEIGHT,'--imgformat','PNG',
-									'--alt-autoscale-max');
+									'--interlaced','--lower-limit',0,'--alt-autoscale-max');
 
 if($rrdunits!='') {
 	$rrdoptions[]='--vertical-label';
