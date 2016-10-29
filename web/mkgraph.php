@@ -62,7 +62,7 @@ $ds=1;
 while(1) {
 	if(isset($graph["Graph${sgc}DataSource${ds}"])) {
 		$plots[$ds]="DEF:fn${ds}=${rrdsrcfile}:".$graph["Graph${sgc}DataSource${ds}"].":MAX";
-		$lines[$ds]="LINE2:fn${ds}".$gcol[$ds].":".$graph["Graph${sgc}DataLabel${ds}"];
+		$lines[$ds]="LINE1:fn${ds}".$gcol[$ds].":".$graph["Graph${sgc}DataLabel${ds}"];
 		$xport[$ds]="XPORT:fn${ds}:\"".$graph["Graph${sgc}DataLabel${ds}"]."\"";
 		$ds++;
 	} else break;
