@@ -1007,6 +1007,19 @@ if(isset($args['init-stats'])) {
 	$args['get-stats']=1;
 }
 
+if(isset($args['clear-stats'])) {
+	if($args['clear-stats']==1) $inst=$instances; else $inst=explode(',',str_replace('"','',trim($args['clear-stats'])));
+	foreach($inst as $i) if(!in_array($i,$instances)) die(sprintf("An instance named '%s' was not found! Use --inst to show possible instance names.\n",$i));
+	foreach($inst as $i) {
+		$rrd_base=sprintf(STATS_DIR,$i);
+		printf("%s Removing all Statistics for Instance: '%s'\t\t",date('Y-m-d H:i:s'),$i);
+		$cmd="cd ${rrd_base}; rm -f *.rrd";
+		`$cmd`;
+		print "[  OK  ]\n";
+	}
+	$args['get-stats']=$args['clear-stats'];
+}
+
 if(isset($args['get-stats'])) {
 
 	if($args['get-stats']==1) $inst=$instances; else $inst=explode(',',str_replace('"','',trim($args['get-stats'])));
@@ -1096,6 +1109,12 @@ if(isset($args['get-stats'])) {
 								$sgc=1;
 								foreach($regions_list[$inst] as $region) {
 									$rrd_file=sprintf("%s%s_%s.rrd",$rrd_base,$used_uuids[$inst.'/'.$region],preg_replace(array("/[^A-Z0-9\ ]/i","/[\ ]/"),array("","_"),$h));
+									if(!file_exists($rrd_file) or isset($args['init-stats'])) {
+										$data=create_rrd_db($rrd_file,$rrd_date,$d);
+									} else {
+										$env=$base_env.sprintf("\$RegionName='%s'; ",$region);
+										$data=update_rrd_db($rrd_file,$rrd_date,$d,$stats,$env);
+									}
 									$rrd_graph["Graph${sgc}DataFile"]=$rrd_file;
 									$rrd_graph["Graph${sgc}Heading"]=$h;
 									$rrd_graph["Graph${sgc}DataUnits"]=$d['DataUnits'];
@@ -1106,12 +1125,7 @@ if(isset($args['get-stats'])) {
 									for($i=1;$i<=$ds;$i++) {
 										$rrd_graph["Graph${sgc}DataSource${i}"]="DS${i}";
 										$rrd_graph["Graph${sgc}DataLabel${i}"]=$d["Data${i}Label"];
-									}
-									if(!file_exists($rrd_file) or isset($args['init-stats'])) {
-										create_rrd_db($rrd_file,$rrd_date,$d);
-									} else {
-										$env=$base_env.sprintf("\$RegionName='%s'; ",$region);
-										update_rrd_db($rrd_file,$rrd_date,$d,$stats,$env);
+										$rrd_graph["Graph${sgc}DataLastValue${i}"]=$data[$i];
 									}
 									$sgc++;
 								}
@@ -1119,6 +1133,12 @@ if(isset($args['get-stats'])) {
 								$sgc=1;
 								foreach($interfaces as $interface=>$idata) {
 									$rrd_file=sprintf("%s%s_%s.rrd",$rrd_base,$interface,preg_replace(array("/[^A-Z0-9\ ]/i","/[\ ]/"),array("","_"),$h));
+									if(!file_exists($rrd_file) or isset($args['init-stats'])) {
+										$data=create_rrd_db($rrd_file,$rrd_date,$d);
+									} else {
+										$env=$base_env.sprintf("\$Interface='%s'; ",$interface);
+										$data=update_rrd_db($rrd_file,$rrd_date,$d,$stats,$env);
+									}
 									$rrd_graph["Graph${sgc}DataFile"]=$rrd_file;
 									$rrd_graph["Graph${sgc}Heading"]=$h;
 									$rrd_graph["Graph${sgc}DataUnits"]=$d['DataUnits'];
@@ -1128,17 +1148,18 @@ if(isset($args['get-stats'])) {
 									for($i=1;$i<=$ds;$i++) {
 										$rrd_graph["Graph${sgc}DataSource${i}"]="DS${i}";
 										$rrd_graph["Graph${sgc}DataLabel${i}"]=$d["Data${i}Label"];
-									}
-									if(!file_exists($rrd_file) or isset($args['init-stats'])) {
-										create_rrd_db($rrd_file,$rrd_date,$d);
-									} else {
-										$env=$base_env.sprintf("\$Interface='%s'; ",$interface);
-										update_rrd_db($rrd_file,$rrd_date,$d,$stats,$env);
+										$rrd_graph["Graph${sgc}DataLastValue${i}"]=$data[$i];
 									}
 									$sgc++;
 								}
 							} else {
 								$rrd_file=sprintf("%s%s.rrd",$rrd_base,preg_replace(array("/[^A-Z0-9\ ]/i","/[\ ]/"),array("","_"),$h));
+								if(!file_exists($rrd_file) or isset($args['init-stats'])) {
+									$data=create_rrd_db($rrd_file,$rrd_date,$d);
+								} else {
+									$env=$base_env;
+									$data=update_rrd_db($rrd_file,$rrd_date,$d,$stats,$env);
+								}
 								$rrd_graph["Graph1DataFile"]=$rrd_file;
 								$rrd_graph["Graph1Heading"]=$h;
 								$rrd_graph["Graph1DataUnits"]=$d['DataUnits'];
@@ -1147,12 +1168,7 @@ if(isset($args['get-stats'])) {
 								for($i=1;$i<=$ds;$i++) {
 									$rrd_graph["Graph1DataSource${i}"]="DS${i}";
 									$rrd_graph["Graph1DataLabel${i}"]=$d["Data${i}Label"];
-								}
-								if(!file_exists($rrd_file) or isset($args['init-stats'])) {
-									create_rrd_db($rrd_file,$rrd_date,$d);
-								} else {
-									$env=$base_env;
-									update_rrd_db($rrd_file,$rrd_date,$d,$stats,$env);
+									$rrd_graph["Graph1DataLastValue${i}"]=$data[$i];
 								}
 							}
 							$rrd_data["${inst}:${gc}"]=$rrd_graph;
@@ -1336,13 +1352,9 @@ spaces.
   [--show [--json]] Instead of updating the RRD database, just show the data
                     collected in a readable format, or in a json format.
 
---graph-stats [InstanceName[,InstanceName]...]
-          Required parameters:
-  --start unixtime
-  --end unixtime
-					Produce pretty set of graphs for all or just the named Instances,
-					and for a given time period.
-					*NOT IMPLEMENTED YET!*
+--clear-stats [InstanceName[,InstanceName]...]
+           Remove and recreate the RRD database files for the named Instance(s).
+           Effectively clears all the past statistics and starts again.
 
 If an Instance crashes while running, it will be attempted to be restarted.
 If it starts and then dies within ".MAX_RESTART_TIME_INTERVAL." seconds then after ".MAX_RESTART_COUNT." times of trying,
