@@ -1013,7 +1013,7 @@ if(isset($args['clear-stats'])) {
 	foreach($inst as $i) {
 		$rrd_base=sprintf(STATS_DIR,$i);
 		printf("%s Removing all Statistics for Instance: '%s'\t\t",date('Y-m-d H:i:s'),$i);
-		$cmd="cd ${rrd_base}; rm -f *.rrd";
+		$cmd="cd ${rrd_base} && rm -f *.rrd 2>/dev/null";
 		`$cmd`;
 		print "[  OK  ]\n";
 	}
