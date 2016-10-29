@@ -213,6 +213,7 @@ function create_rrd_db($rrd_file,$rrd_date,$d) {
 	$rrd[]=$rrd_date;
 	$rrd[]='--step';
 	$rrd[]=RRD_STAT_UPDATE_INTERVAL;
+	$data=array();
 	for($i=1;$i<=$ds;$i++) {
 		if(isset($d["Data${i}"])) {
 			if(isset($d["Data${i}Min"]) and preg_match("/^[0-9U]+$/",$d["Data${i}Min"])) $dataMin=strip_quoted_string($d["Data${i}Min"]); else $dataMin='0';
@@ -221,6 +222,7 @@ function create_rrd_db($rrd_file,$rrd_date,$d) {
 			$dataDS="DS${i}";
 			$rrd[]=sprintf('DS:%s:%s:%s:%s:%s',$dataDS,$dataType,RRD_STAT_UPDATE_INTERVAL,$dataMin,$dataMax);
 		}
+		$data[$i]=0;
 	}
 	$rrd[]=sprintf('RRA:MAX:%s:%s',RRD_XFF,RRD_RRA_MIN);
 	$rrd[]=sprintf('RRA:MAX:%s:%s',RRD_XFF,RRD_RRA_5MIN);
@@ -229,7 +231,7 @@ function create_rrd_db($rrd_file,$rrd_date,$d) {
 	if($debug>1) print_r($rrd);
 	if(isset($args['init-stats'])) `rm -f $rrd_file 2>/dev/null`;
 	if(!rrd_create($rrd_file,$rrd)) printf("Error: %s  creating RRD database '%s'\n",rrd_error(),$rrd_file);
-	return $rrd;
+	return $data;
 }
 
 function update_rrd_db($rrd_file,$rrd_date,$d,$stats,$env) {
@@ -250,6 +252,7 @@ function update_rrd_db($rrd_file,$rrd_date,$d,$stats,$env) {
 			if(isset($d["Data${i}Min"]) and preg_match("/^[0-9U]+$/",$d["Data${i}Min"])) $dataMin=strip_quoted_string($d["Data${i}Min"]); else $dataMin='0';
 			if(isset($d["Data${i}Max"]) and preg_match("/^[0-9U]+$/",$d["Data${i}Min"])) $dataMax=strip_quoted_string($d["Data${i}Max"]); else $dataMax='U';
 			if(isset($d["Data${i}Type"]) and in_array($d["Data${i}Type"],$rrd_types)) $dataType=strip_quoted_string($d["Data${i}Type"]); else $dataType='GAUGE';
+			//if($dataType=='DERIVE') print "${rrd_file}\n";
 			$data_keys=explode("||",strip_quoted_string($d["Data${i}"]));
 			$dataKey='';
 			foreach($data_keys as $k) $dataKey.='["'.$k.'"]';
@@ -259,17 +262,18 @@ function update_rrd_db($rrd_file,$rrd_date,$d,$stats,$env) {
 			if(!isset($value)) $value=0; //shouldn't happen unless there is a parsing error
 			if($debug>1) printf("Got value: %s * %s = %s",$value,$dm,$value*$dm);
 			$value=$value*$dm; //data multiplier
-			if($dataType=='COUNTER') {
+			if($dataType=='COUNTER' or $dataType=='DERIVE') {
 				$value=round($value,0);
 				if($debug>1) printf(", type is COUNTER, rounding to %s",$value);
 			}
 			if($debug>1) print "\n";
-			$data[]=sprintf('%s:%s',$rrd_date,$value);
-		} else $data[]=sprintf('%s:%s',$rrd_date,0);
+			$data[$i]=$value;
+		} else $data[$i]=0;
 	}
-	$rrd[]=implode(":",$data);
+	$rrd[]=$rrd_date.':'.implode(":",$data);
 	if($debug>1) print_r($rrd);
 	if(!rrd_update($rrd_file,$rrd)) printf("Error: %s\n",rrd_error());
+	return $data;
 }
 
 function signals($signal) {

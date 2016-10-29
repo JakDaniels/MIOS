@@ -55,21 +55,23 @@ if($rrd=='HOUR') $rrddef=RRD_RRA_HOUR;
 if($rrd=='DAY') $rrddef=RRD_RRA_DAY;
 
 $t=explode(":",$rrddef);
-$rrdend=$graph["Graph${sgc}LastTimeStamp"];
+$rrdend=$graph["Graph${sgc}LastTimeStamp"]+RRD_STAT_UPDATE_INTERVAL;
 $rrdstart=$rrdend-($t[0]*RRD_STAT_UPDATE_INTERVAL*$t[1]);
 
 $ds=1;
 while(1) {
 	if(isset($graph["Graph${sgc}DataSource${ds}"])) {
 		$plots[$ds]="DEF:fn${ds}=${rrdsrcfile}:".$graph["Graph${sgc}DataSource${ds}"].":MAX";
-		$lines[$ds]="LINE1:fn${ds}".$gcol[$ds].":".$graph["Graph${sgc}DataLabel${ds}"];
+		$lines[$ds]="LINE2:fn${ds}".$gcol[$ds].":".$graph["Graph${sgc}DataLabel${ds}"];
+		$xport[$ds]="XPORT:fn${ds}:\"".$graph["Graph${sgc}DataLabel${ds}"]."\"";
 		$ds++;
 	} else break;
 }
 $ds--;
 
 $rrdoptions=array('--start',$rrdstart,'--end',$rrdend,'--title',$rrdtitle,
-									'--width',RRD_GRAPH_WIDTH,'--height',RRD_GRAPH_HEIGHT,'--imgformat','PNG');
+									'--width',RRD_GRAPH_WIDTH,'--height',RRD_GRAPH_HEIGHT,'--imgformat','PNG',
+									'--alt-autoscale-max');
 
 if($rrdunits!='') {
 	$rrdoptions[]='--vertical-label';
@@ -83,7 +85,13 @@ $g=rrd_graph($rrdimgfile, $rrdoptions);
 
 if($debug) {
 	print "<pre>".print_r($g,1)."</pre>\n";
+
+
+	$rrdoptions=array_merge(array('--start',$rrdstart,'--end',$rrdend),$plots,$xport);
+	print "<pre>".print_r($rrdoptions,1)."</pre>\n";
 	print "<pre>".print_r(rrd_error(),1)."</pre>\n";
+	$rrd=rrd_xport($rrdoptions);
+	print "<pre>".print_r($rrd,1)."</pre>\n";
 } else {
 	output($rrdimgfile);
 
