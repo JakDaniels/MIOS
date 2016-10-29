@@ -57,12 +57,12 @@
 	//used only if you enable remote admin http server and configure it for https
 	define('SSL_PORT_OFFSET',500); //offset from http base port
 
-	define('TIMEOUT',30); //timeout in seconds when starting and stopping instances
+	define('TIMEOUT',60); //timeout in seconds when starting and stopping instances
 	define('MAX_RESTART_COUNT',3); //how many times do we attempt a restart until mark as broken?
 	define('MAX_RESTART_TIME_INTERVAL',30); //how long do we consider an instance being up means it's not broken
 	define('TMUX_SESSION_NAME','OS'); //name for the session that tmux will use for its instance windows
-	define('TMUX_START_TIMEOUT',5);
-	define('TMUX_STOP_TIMEOUT',10);
+	define('TMUX_START_TIMEOUT',10);
+	define('TMUX_STOP_TIMEOUT',20);
 	define('TMUX_CONTROL_PREFIX','C-a'); //what control key combo do we use for tmux? CTRL+A
 	define('TMUX_SCROLL_BUFFER',10000);  //how much scrollback do we want?
 	
