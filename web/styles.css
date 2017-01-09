@@ -80,7 +80,7 @@ html ul.tabs2 li.active2, html ul.tabs2 li.active2 a:hover {
 .tab_container {
 	border: 1px solid #999;
 	border-top: none;
-	overflow: hidden;
+	overflow: scroll-x;
 	clear: both;
 	float: left; 
 	width: 100%;

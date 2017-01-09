@@ -93,6 +93,7 @@ if($debug) {
 	$rrd=rrd_xport($rrdoptions);
 	print "<pre>".print_r($rrd,1)."</pre>\n";
 } else {
+	sleep(1);
 	output($rrdimgfile);
 
 }
