@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set('Europe/London');
+
 //define('HOME_DIR',trim(`echo ~`));
 $mydir=__DIR__;
 $mydir=substr($mydir,0,strpos($mydir,'MIOS')-1);
@@ -19,6 +21,9 @@ define('INC_DIR',MIOS_DIR.'php_inc/');
 define('OS_RUNNER',INC_DIR.'os_runner.sh.php');
 define('OS_RUNNER_LOG_DIR',MIOS_DIR.'Logs/');
 define('OS_RUNNER_LOG',OS_RUNNER_LOG_DIR.'os_runner.log');
+define('RUN_LIST',BASE_CONFIGS.'.runlist');
+define('PID_FILE',BASE_CONFIGS.'.pidfile');
+define('TMUX_FILE',HOME_DIR.'/.tmux.conf');
 define('OS_EXEC',INC_DIR.'os_exec.sh');
 define('GRAPH_DIR',MIOS_DIR.'web/img_cache/');
 
@@ -28,4 +33,7 @@ define('SHOWINFO',1);
 define('SHOWCMDS',2);
 define('SHOWCMDERRORS',4);
 define('LOGCMDERRORS',8);
+
+// a list of the RRDTool datatypes we can use in stats.
+define('RRD_TYPES','GAUGE,COUNTER,DERIVE,DCOUNTER,DDERIVE,ABSOLUTE,COMPUTE');
 ?>

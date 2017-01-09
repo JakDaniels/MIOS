@@ -5,9 +5,10 @@ include('php_inc/os_defines.inc.php');
 
 if(file_exists(BASE_CONFIGS.'config.inc.php')) include(BASE_CONFIGS.'config.inc.php');
 else die("You must create a config file '".BASE_CONFIGS."config.inc.php' before you can use this script!\nPlease use '".BASE_CONFIGS."config.inc.php.example' as a template .\n");
-include('php_inc/dbfunctions.inc.php');
-include('php_inc/functions.inc.php');
-include('php_inc/os_functions.inc.php');
+include(INC_DIR.'dbfunctions.inc.php');
+include(INC_DIR.'functions.inc.php');
+include(INC_DIR.'os_functions.inc.php');
+include(INC_DIR.'os_config_defines.inc.php');
 
 ob_implicit_flush ();
 set_time_limit (0);

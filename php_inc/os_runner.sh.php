@@ -1,29 +1,14 @@
 #!/usr/bin/php -q
 <?php
 error_reporting (E_ALL);
-define('HOME_DIR',trim(`echo ~`));
-define('BASE_DIR',HOME_DIR.'/MIOS/Instances/');
-define('BASE_CONFIGS',BASE_DIR.'.config/');
-define('CONFIGS_DIR',BASE_DIR.'%s/Configs/');
-define('LOGS_DIR',BASE_DIR.'%s/Logs/');
-define('SCRIPTS_DIR',BASE_DIR.'%s/ScriptEngines/');
-define('OUT_CONF_DIR',BASE_DIR.'%s/ConfigOut/');
-define('BIN_DIR',HOME_DIR.'/opensim/bin/');
-define('INC_DIR',HOME_DIR.'/MIOS/php_inc/');
-define('OS_EXEC',INC_DIR.'os_exec.sh');
+include('php_inc/os_defines.inc.php');
 
 include(BASE_CONFIGS.'config.inc.php');
 include(INC_DIR.'functions.inc.php');
 include(INC_DIR.'os_functions.inc.php');
+include(INC_DIR.'os_config_defines.inc.php');
 
 ob_implicit_flush ();
-define("DEBUG",0);
-//script specific debug defines
-define('SHOWINFO',1);
-define('SHOWCMDS',2);
-define('SHOWCMDERRORS',4);
-define('LOGCMDERRORS',8);
-
 set_time_limit (0);
 
 // signal handling
