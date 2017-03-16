@@ -31,11 +31,12 @@ if(isset($args['h']) or isset($args['help'])) error(usage());
 if(isset($args['d']) or isset($args['debug'])) $debug=1; else $debug=0;
 
 if($debug) date_log("***** Started *****\n");
-$runlist=BASE_CONFIGS.'.runlist';
-$pidfile=BASE_CONFIGS.'.pidfile';
-$tmuxfile=HOME_DIR.'/.tmux.conf';
 
+$runlist=RUN_LIST;
+$pidfile=PID_FILE;
+$tmuxfile=TMUX_FILE;
 $tsn=TMUX_SESSION_NAME;
+
 write_text_file($tmuxfile,"set-option -g prefix ".TMUX_CONTROL_PREFIX."\nset-option -g history-limit ".TMUX_SCROLL_BUFFER."\n");
 
 //`tmux new-session -d -s $tsn -n Top -x 132 -y 50 'top' || tmux new-window -d -n Top -t $tsn:0 'top' 2>/dev/null`;
