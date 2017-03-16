@@ -748,7 +748,7 @@ if($start) {
 						if(isset($args['f']) or isset($args['fixed'])) $cstatus='stopped';
 						else {
 							print "\r\t\t\t\t\t\t[FAILED] Instance appears to be broken! Use -f to force start.\n";
-							printf("\tor to try a manual unmanaged start you can invoke the instance with: %s \"%s\"\n",OS_EXEC,$inipath);
+							printf("\tor to try a manual unmanaged start you can invoke the instance with 'mios --start %s --manual' or  %s \"%s\"\n",$inst,OS_EXEC,$inipath);
 							break;
 						}
 					}
@@ -767,7 +767,7 @@ if($start) {
 					}
 					if($cstatus=='stop') {
 						print "\r\t\t\t\t\t\t[FAILED] Instance is still stopping!\n";
-						printf("\tTo try a manual unmanaged start you can invoke the instance with: %s \"%s\"\n",OS_EXEC,$inipath);
+						printf("\tTo try a manual unmanaged start you can invoke the instance with 'mios --start %s --manual' or: %s \"%s\"\n",$inst,OS_EXEC,$inipath);
 						break;
 					}
 					sleep(2);
@@ -775,7 +775,7 @@ if($start) {
 					print ".";
 					if($timer>=TIMEOUT) {
 						printf("\r\t\t\t\t\t\t[FAILED] Instance did not start within %s seconds!\n",TIMEOUT);
-						printf("\tTo try a manual unmanaged start you can invoke the instance with: %s \"%s\"\n",OS_EXEC,$inipath);
+						printf("\tTo try a manual unmanaged start you can invoke the instance with 'mios --start %s --manual' or %s \"%s\"\n",$inst,OS_EXEC,$inipath);
 						break;
 					}
 				}

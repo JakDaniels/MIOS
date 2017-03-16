@@ -1,7 +1,7 @@
 #!/usr/bin/php -q
 <?php
 error_reporting (E_ALL);
-include('php_inc/os_defines.inc.php');
+include('./os_defines.inc.php');
 
 include(BASE_CONFIGS.'config.inc.php');
 include(INC_DIR.'functions.inc.php');
