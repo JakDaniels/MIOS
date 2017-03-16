@@ -1,4 +1,4 @@
-	<?php
+<?php
 
 	//OpenSim Configs: here we list all the places that we get configs from. These may be standalone or grid
 	//configurations, each instance will use the named config set as its base. These base configs
