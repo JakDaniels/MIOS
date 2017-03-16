@@ -13,8 +13,6 @@ include(INC_DIR.'os_config_defines.inc.php');
 ob_implicit_flush ();
 set_time_limit (0);
 
-print "x"; exit(0);
-
 // signal handling
 declare(ticks=1); $must_exit=0;
 pcntl_signal(SIGTERM, "signal_handler");
