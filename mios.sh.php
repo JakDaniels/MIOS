@@ -1029,7 +1029,7 @@ if(isset($args['init-stats'])) {
 	$cronlines.=sprintf("MAILTO=%s\n",MAIL_TO);
 	$cronlines.=sprintf("HOME=%s\n",HOME_DIR);
 	$cronlines.=sprintf("* * * * * %smios.sh.php --get-stats 2>&1 >>%smios_cron.log\n",MIOS_DIR,OS_RUNNER_LOG_DIR);
-	if(defined(AUTO_RESTART_INSTANCES)) {
+	if(defined('AUTO_RESTART_INSTANCES')) {
 		$cronlines.=sprintf("%s %smios.sh.php --restart --force 2>&1 >>%smios_cron.log\n",AUTO_RESTART_INSTANCES,MIOS_DIR,OS_RUNNER_LOG_DIR);
 	}
 	$crontab=BASE_CONFIGS.'mios_crontab.txt';
