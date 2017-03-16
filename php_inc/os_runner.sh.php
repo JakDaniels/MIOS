@@ -123,7 +123,7 @@ while(1) {
 			}
 		}
 
-		if($action=='stop') {
+		if($action=='stop' or $action=='kill') {
 			if($debug) date_log(sprintf("Stopping Instance: %s...\n",$inst));
 			$cmd=sprintf("tmux send-keys -t %s:%s 'shutdown' Enter",$tsn,$index);
 			if($debug) date_log(sprintf("Running: %s\n",$cmd));
@@ -136,7 +136,7 @@ while(1) {
 			$started_count[$inst]=0;
 		}
 
-		if($action=='start' or $action=='stop' or $action=='break') {
+		if($action=='start' or $action=='stop' or $action=='break' or $action=='kill') {
 			$rl=read_text_file_to_array_with_lock($runlist,LOCK_EX);
 			for($i=0;$i<count($rl);$i++) {
 				if(substr($rl[$i],0,strlen($entry))==$entry) {

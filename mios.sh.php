@@ -486,7 +486,8 @@ if($stop) {
 				break;
 			}
 			if($cstatus=='started') {
-				$rl[$i]=sprintf("%s\t%s\t%s\t%s",$inst,$rs,$base_port[$inst],'stop');
+				if(isset($args['f']) or isset($args['force'])) $rl[$i]=sprintf("%s\t%s\t%s\t%s",$inst,$rs,$base_port[$inst],'kill');
+				else $rl[$i]=sprintf("%s\t%s\t%s\t%s",$inst,$rs,$base_port[$inst],'stop');
 				sort($rl);
 				write_text_file_from_array_with_lock($runlist,$rl,LOCK_EX);
 			}
@@ -521,8 +522,30 @@ if($stop) {
 			$timer+=2;
 			print ".";
 			if($timer>=TIMEOUT) {
-				printf("\r\t\t\t\t\t\t[FAILED] Instance did not stop within %s seconds!\n",TIMEOUT);
-				break;
+				if(isset($args['f']) or isset($args['force'])) { //asked for a forced stop so bang it hard now
+					$pidpath=sprintf(LOGS_DIR,$inst).'OpenSim.pid';
+					if(file_exists($pidpath)) {
+						$instpid=trim(file_get_contents($pidpath));
+						if(file_exists("/proc/${instpid}")) {
+							if($debug) printf("Sending process %s a hard kill signal...\n",$instpid);
+							posix_kill($instpid, SIGKILL); //hard kill the process
+							sleep(1);
+							$cstatus='stopped';
+							$rl[$i]=sprintf("%s\t%s\t%s\t%s",$inst,$rs,$base_port[$inst],'stopped');
+							sort($rl);
+							write_text_file_from_array_with_lock($runlist,$rl,LOCK_EX);
+						} else {
+							printf("\r\t\t\t\t\t\t[FAILED] Instance did not stop within %s seconds!\n",TIMEOUT);
+							break;
+						}
+					} else {
+						printf("\r\t\t\t\t\t\t[FAILED] Instance did not stop within %s seconds!\n",TIMEOUT);
+						break;
+					}
+				} else {
+					printf("\r\t\t\t\t\t\t[FAILED] Instance did not stop within %s seconds!\n",TIMEOUT);
+					break;
+				}
 			}
 		}
 	}
@@ -1311,11 +1334,15 @@ spaces.
 --stop [InstanceName[,InstanceName]...]
            Attempt to stop all or just the named Instances. If an Instance for
            some reason does not stop in a timely manner, it will show [FAILED].
+           If --force is specified too, then the Instance process will be killed
+           if it fails to shutdown cleanly.
 
 --restart [InstanceName[,InstanceName]...]
            Attempt to restart all or just the named Instances. If an Instance
            for some reason does not stop or start in a timely manner, it will
-           show as [FAILED].
+           show as [FAILED]. As above, if --force is specified too, then the
+           Instance process will be killed if it fails to shutdown cleanly,
+           before it is restarted.
 
 --status [InstanceName[,InstanceName]...]
            Shows the running status of all or just the named Instances.
