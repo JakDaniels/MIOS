@@ -90,6 +90,15 @@
 
 	define('MAIL_TO',''); //where do we email stuff to?
 	
-	date_default_timezone_set('Europe/London');
+	//# Example of job definition:
+	//# .---------------- minute (0 - 59)
+	//# |  .------------- hour (0 - 23)
+	//# |  |  .---------- day of month (1 - 31)
+	//# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+	//# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+	//# |  |  |  |  |
+	//# *  *  *  *  *
+
+	define('AUTO_RESTART_INSTANCES','00 06 * * *'); //set the time interval here, or use # in fron to disable
 
 ?>
