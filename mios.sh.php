@@ -136,9 +136,9 @@ if(isset($args['init-mysql'])) {
 
 //get a list of instance configs
 $instances=enum_instances();
-$runlist=BASE_CONFIGS.'.runlist';
-$pidfile=BASE_CONFIGS.'.pidfile';
-$tmuxfile=HOME_DIR.'/.tmux.conf';
+$runlist=RUN_LIST;
+$pidfile=PID_FILE;
+$tmuxfile=TMUX_FILE;
 
 //****************************************************************************************************ADD INSTANCE**************
 if(isset($args['add-instance'])) {
