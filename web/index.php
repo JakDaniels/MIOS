@@ -1,7 +1,13 @@
 <?php
 
 error_reporting (E_ALL);
-include('php_inc/os_defines.inc.php');
+
+$mydir=__DIR__;
+$mydir=substr($mydir,0,strpos($mydir,'MIOS')-1);
+define('HOME_DIR',$mydir);
+define('MIOS_DIR',HOME_DIR.'/MIOS/');
+define('INC_DIR',MIOS_DIR.'php_inc/');
+include(INC_DIR.'os_defines.inc.php');
 
 if(file_exists(BASE_CONFIGS.'config.inc.php')) include(BASE_CONFIGS.'config.inc.php');
 else die("You must create a config file '".BASE_CONFIGS."config.inc.php' before you can use this script!\nPlease use '".BASE_CONFIGS."config.inc.php.example' as a template .\n");
