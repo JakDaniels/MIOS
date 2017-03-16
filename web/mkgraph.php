@@ -49,7 +49,7 @@ if(!file_exists($graph["Graph${sgc}DataFile"])) imgerror();
 $rrdsrcfile=$graph["Graph${sgc}DataFile"];
 $t=explode("/",$rrdsrcfile);
 //$rrdimgfile='/tmp/'.substr($t[count($t)-1],0,-4).'.png';
-$rrdimgfile=GRAPH_DIR.substr($t[count($t)-1],0,-4).'.png';
+$rrdimgfile=sprintf('%s%s_%s.png',GRAPH_DIR,substr($t[count($t)-1],0,-4),$rrd);
 
 $rrdtitle=$graph["Graph${sgc}Heading"];
 $rrdunits=$graph["Graph${sgc}DataUnits"];
@@ -98,9 +98,7 @@ if($debug) {
 	$rrd=rrd_xport($rrdoptions);
 	print "<pre>".print_r($rrd,1)."</pre>\n";
 } else {
-	sleep(1);
 	output($rrdimgfile);
-
 }
 /*	Graph1DataFile = /home/opensim/MIOS/Instances/UbOde256a/Stats/22b732cc-1362-9e61-9342-c148ccbb299a_Scene_Agents.rrd
 	Graph1Heading = "Scene: Agents"
