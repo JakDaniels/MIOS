@@ -900,10 +900,15 @@ if(is_array($visitors)) {
 	foreach($visitors as $vi) if(!in_array($vi,$instances)) die(sprintf("An instance named '%s' was not found! Use --inst to show possible instance names.\n",$vi));
 	$instances=$visitors;
 
+	if(isset($args['csv'])) {
+		$csv=1;
+		print "DateTime,Instance,Region,Avatar,UUID,Presence\n";
+	} else $csv=0;
+
 	foreach($instances as $inst) {
 		$logpath=sprintf(LOGS_DIR,$inst).'OpenSim.log';
 		if($debug) printf("Checking log: %s\n",$logpath);
-		printf("******** Visitor Log for Instance: '%s' ********\n",$inst);
+		if(!$csv) printf("******** Visitor Log for Instance: '%s' ********\n",$inst);
 		$visits=array();
 
 		/* old way, prone to failure if log format changes
@@ -922,8 +927,9 @@ if(is_array($visitors)) {
 			while(!feof($fp)) {
 				$line=trim(fgets($fp));
 				//match rule #1
-				if(preg_match("/([0-9\-]{10}\ [0-9:,]{12}).*?\[SCENE\]:\ Region\ (.*?)\ authenticated\ .*?agent\ ([^\ ]+)\ ([^\ ]+)\ ([0-9a-f\-]{36})/",$line,$m)) {
-					$visits[$m[1]]=array('Region'=>$m[2],'AvatarFirst'=>$m[3],'AvatarLast'=>$m[4],'UUID'=>$m[5],'Rule'=>'#1');
+				if(preg_match("/([0-9\-]{10}\ [0-9:,]{12}).*?\[SCENE\]:\ Region\ (.*?)\ authenticated\ .*?(root|child)\ agent\ ([^\ ]+)\ ([^\ ]+)\ ([0-9a-f\-]{36})/",$line,$m)) {
+					$visits[$m[1]]=array('Instance'=>$inst,'Region'=>$m[2],'Presence'=>$m[3],'AvatarFirst'=>$m[4],'AvatarLast'=>$m[5],
+															 'Avatar'=>$m[4].' '.str_replace(' ','',$m[5]),'UUID'=>$m[6],'Rule'=>'#1');
 				}
 				//match rule #2
 				//if(preg_match("/([0-9\-]{10}\ [0-9:,]{12}).*?\[SCENE\]:\ Found\ presence\ ([^\ ]+)\ ([^\ ]+)\ ([0-9a-f\-]{36})\ as\ root\ in\ (.*?)\ after/",$line,$m)) {
@@ -933,7 +939,9 @@ if(is_array($visitors)) {
 			@fclose($fp);
 			ksort($visits);
 			foreach($visits as $k=>$v) {
-				printf("%s\t%s\t%s\t%s\t%s\t%s\n",$k,$v['Region'],$v['AvatarFirst'],$v['AvatarLast'],$v['UUID'],$v['Rule']);
+				//printf("%s\t%s\t%s\t%s\t%s\t%s\n",$k,$v['Region'],$v['AvatarFirst'],$v['AvatarLast'],$v['UUID'],$v['Rule']);
+				if($csv) printf("%s,%s,%s,%s,%s,%s\n",$k,$v['Instance'],$v['Region'],$v['Avatar'],$v['UUID'],$v['Presence']);
+				else printf("%s %s %s %s %s\n",pad_clip_string($k,23),pad_clip_string($v['Region'],17),pad_clip_string($v['Avatar'],48),pad_clip_string($v['UUID'],36),$v['Presence']);
 			}
 		}
 	}
@@ -1361,6 +1369,7 @@ spaces.
 --visitors [InstanceName[,InstanceName]...]
            Scan the logs and show the visitors that have arrived at the Regions
            hosted by the named Instances.
+  [--csv]  Display the results in comma separated format for a spreadsheet.
 
 --config [InstanceName[,InstanceName]...]
            Show the running config of all or just the named Instances. An
