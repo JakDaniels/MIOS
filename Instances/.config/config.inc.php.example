@@ -74,8 +74,6 @@
 	
 	define('OPENSIM_GIT_REPOSITORY','git://opensimulator.org/git/opensim');
 
-	// a list of the RRDTool datatypes we can use in stats.
-	define('RRD_TYPES','GAUGE,COUNTER,DERIVE,DCOUNTER,DDERIVE,ABSOLUTE,COMPUTE');
 
 	// If you change these RRD settings you will need to re-initialise the RRD databases.
 	define('RRD_STAT_UPDATE_INTERVAL',60); //how often will we be updating the stats in seconds?
