@@ -347,5 +347,4 @@ function get_recordcount($sql) {
 	$R=dbsql2array($sql);
 	return $R[0];
 }
-
 ?>
