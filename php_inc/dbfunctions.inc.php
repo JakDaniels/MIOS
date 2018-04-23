@@ -221,53 +221,6 @@ function dbsql2hash3($query) {
 	return($row);
 }
 
-// turn a query into an array of field variables, each array index=1 row
-function dbq2a($table,$fields,$order) { //called with table name and comma separated list of fields and an order by field (or 0)
-	$Q="select $fields from $table";
-	if ($order) $Q .=" order by $order";
-	$R=dbquery($Q);
-	$cr=0;
-	while ($D=mysql_fetch_row($R)) {	//get each row as array
-		for ($i=0; $i<count($D); $i++ ){
-			$f=mysql_field_name($R,$i);
-			if ($cr==0)	global $$f;
-			${$f}[$cr++]=$D[$i];																	//turn all fields into arrays of the same name
-		}
-	}
-	return ($cr-1);	//also return the number of rows
-}
-
-function dbupdate($table, $k) { //called with table name and key
-	$R=dbquery( "show fields from $table");
-	$Q="update $table set ";
-	$D = mysql_fetch_array($R);	//skip key field
-	while ($D = mysql_fetch_array($R)) {
-		global $$D["Field"];
-		if (gettype($$D["Field"]=="string")) {
-			$Q .=$D["Field"]."='".dbencode($$D["Field"])."', ";
-		} else {
-			$Q .=$D["Field"]."='".$$D["Field"]."', ";
-		}
-	}
-	$Q=substr($Q,0,-2)." where L0=$k";
-	if (dbquery("$Q")) 	return 1; else return 0;
-}
-
-function dbinsert($table) { //called with table name
-	$R=dbquery( "show fields from $table");
-	$Q="insert into $table values (";
-	while ($D = mysql_fetch_array($R)) {
-		global $$D["Field"];
-		if (gettype($$D["Field"]=="string")) {
-			$Q .="'".dbencode($$D["Field"])."', ";
-		} else {
-			$Q .="'".$$D["Field"]."', ";
-		}
-	}
-	$Q=substr($Q,0,-2).")";
-	if (dbquery("$Q")) 	return 1; else return 0;
-}
-
 function dbupdate_from_hash($table,$data,$k,$kname='id') { //called with table name, hashed array and key
 	$Q="";
 	while (list($key,$val)=each($data)) $Q.=" $key='".addslashes($val)."',";
